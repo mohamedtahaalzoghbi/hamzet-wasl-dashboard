@@ -153,11 +153,11 @@ function forgotPage() {
 
 /* ---------- layout ---------- */
 var NAV = {
-  volunteer: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['verification', 'حالة التحقق'], ['interview', 'المقابلة'], ['availability', 'مواعيد التطوع'], ['training', 'التدريب'], ['open', 'طلبات مفتوحة'], ['mine', 'عروضي ومحادثاتي'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  disabled_user: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['needs', 'احتياجاتي وإعدادات الوصول'], ['requests', 'طلبات المساعدة'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  association: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['org', 'بيانات الجمعية'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  company: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['org', 'بيانات الشركة'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  admin: [['home', 'نظرة عامة'], ['feed', 'التايم لاين'], ['moderation', 'المجتمعات والبلاغات'], ['vreviews', 'مراجعة المتطوعين'], ['oreviews', 'مراجعة الجهات'], ['slots', 'مواعيد المقابلات'], ['users', 'المستخدمون'], ['deletions', 'طلبات حذف الحساب'], ['leads', 'طلبات الموقع'], ['audit', 'سجل العمليات'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']]
+  volunteer: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['verification', 'حالة التحقق'], ['interview', 'المقابلة'], ['availability', 'مواعيد التطوع'], ['training', 'التدريب'], ['open', 'طلبات مفتوحة'], ['mine', 'عروضي ومحادثاتي'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  disabled_user: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['myapps', 'تقديماتي'], ['needs', 'احتياجاتي وإعدادات الوصول'], ['requests', 'طلبات المساعدة'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  association: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['myjobs', 'وظائفي'], ['org', 'بيانات الجمعية'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  company: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['myjobs', 'وظائفي'], ['org', 'بيانات الشركة'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  admin: [['home', 'نظرة عامة'], ['jobs', 'الوظائف'], ['feed', 'التايم لاين'], ['moderation', 'المجتمعات والبلاغات'], ['vreviews', 'مراجعة المتطوعين'], ['oreviews', 'مراجعة الجهات'], ['slots', 'مواعيد المقابلات'], ['users', 'المستخدمون'], ['deletions', 'طلبات حذف الحساب'], ['leads', 'طلبات الموقع'], ['audit', 'سجل العمليات'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']]
 };
 var unread = 0;
 function layout(page, title, sub, actionsHtml) {
@@ -498,6 +498,59 @@ function admModeration() {
 }
 A.resRep = function (id, hide) { var n = prompt('ملاحظة القرار (اختياري):') || ''; api('/social/reports/' + id + '/resolve', { method: 'POST', body: { hide: hide, resolution: n } }).then(function () { toast('تم'); admModeration(); }).catch(fail); };
 
+/* ---------- jobs ---------- */
+var ET = { full_time: 'دوام كامل', part_time: 'دوام جزئي', internship: 'تدريب' };
+var WA = { remote: 'عن بُعد', onsite: 'من المقر', hybrid: 'هجين' };
+var AST = { submitted: ['tw', 'اتقدم'], reviewing: ['tb', 'قيد المراجعة'], interview: ['tb', 'مقابلة'], accepted: ['tg', 'مقبول'], rejected: ['tr', 'مرفوض'] };
+function ast(s) { var x = AST[s]; return x ? tag(x[0], x[1]) : tag('tn', s); }
+var jf = { q: '', t: '', w: '' };
+function jobCard(j, mode) {
+  return '<div class="card col" style="gap:6px"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><h3 style="margin:0;flex:1">' + esc(j.title) + '</h3>' + tag('tn', ET[j.employmentType] || '') + tag('tn', WA[j.workArrangement] || '') + (j.status === 'closed' ? tag('tr', 'مغلقة') : '') + '</div><div style="color:var(--muted)">' + esc(j.organizationName) + ' · ' + esc(j.location) + '</div><div style="white-space:pre-wrap">' + esc(j.description) + '</div><div class="note i">♿ بيئة العمل: ' + esc(j.accessibilityInformation) + (j.accommodations.length ? '<br>التيسيرات: ' + j.accommodations.map(esc).join('، ') : '') + '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">' + (mode === 'seeker' ? (j.applied ? tag('tg', 'قدمت على الوظيفة') : '<button class="btn s" onclick="A.applyJob(\'' + j.jobId + '\')">قدّم</button>') : '') + (mode === 'owner' ? '<a class="btn s" href="#/jobapps/' + j.jobId + '">المتقدمين (' + j.applicationsCount + ')</a>' + (j.status === 'published' ? '<button class="btn s g" onclick="A.closeJob(\'' + j.jobId + '\')">إغلاق</button>' : '') : '') + (mode === 'admin' ? '<button class="btn s g" onclick="A.closeJob(\'' + j.jobId + '\')">إنزال الوظيفة</button>' : '') + '</div></div>';
+}
+function jobsPage() {
+  layout('jobs', 'الوظائف الدامجة', 'فرص من جهات معتمدة');
+  var qs = '?pageSize=50' + (jf.q ? '&q=' + encodeURIComponent(jf.q) : '') + (jf.t ? '&employmentType=' + jf.t : '') + (jf.w ? '&workArrangement=' + jf.w : '');
+  api('/jobs' + qs).then(function (r) {
+    var l = items(r), mode = auth.role === 'disabled_user' ? 'seeker' : (auth.role === 'admin' ? 'admin' : 'view');
+    var o = function (m, c) { return Object.keys(m).map(function (k) { return '<option value="' + k + '"' + (k === c ? ' selected' : '') + '>' + m[k] + '</option>'; }).join(''); };
+    body('<div class="card" style="display:flex;gap:10px;flex-wrap:wrap"><input id="jq" placeholder="ابحث في الوظائف" value="' + esc(jf.q) + '" style="flex:1;min-width:160px"><select id="jt"><option value="">كل الأنواع</option>' + o(ET, jf.t) + '</select><select id="jw"><option value="">كل أنماط العمل</option>' + o(WA, jf.w) + '</select><button class="btn" id="jgo">بحث</button></div>' + (l.length ? l.map(function (j) { return jobCard(j, mode); }).join('') : empty('مفيش وظائف مطابقة.')));
+    $('jgo').onclick = function () { jf.q = val('jq'); jf.t = val('jt'); jf.w = val('jw'); jobsPage(); };
+  }).catch(errBox);
+}
+A.applyJob = function (id) {
+  var o = modal('<h3>التقديم على الوظيفة</h3><div class="col" style="gap:10px"><label class="fld">رسالة التقديم<textarea id="ap_t" rows="4"></textarea></label><label class="fld">احتياجاتك في بيئة العمل (اختياري، بمزاجك)<textarea id="ap_n" rows="2"></textarea></label><button class="btn" id="ap_go">إرسال</button></div>');
+  $('ap_go').onclick = function () { act($('ap_go'), function () { return api('/jobs/' + id + '/apply', { method: 'POST', body: { applicationText: val('ap_t'), voluntarilySharedNeeds: val('ap_n') || null } }); }, 'تم التقديم').then(function () { o.remove(); jobsPage(); }, function () { }); };
+};
+A.closeJob = function (id) { if (!confirm('إغلاق الوظيفة؟')) return; api('/jobs/' + id + '/close', { method: 'POST' }).then(function () { toast('تم'); route(); }).catch(fail); };
+function myAppsPage() {
+  layout('myapps', 'تقديماتي', 'حالة طلبات التقديم');
+  api('/jobs/applications/mine').then(function (l) {
+    body(l.length ? l.map(function (a) { return '<div class="card" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b style="flex:1">' + esc(a.jobTitle) + '</b>' + ast(a.status) + '<small style="color:var(--muted)">' + dt(a.submittedAt) + '</small></div>'; }).join('') : empty('لسه ما قدمتش على وظائف.'));
+  }).catch(errBox);
+}
+function myJobsPage() {
+  layout('myjobs', 'وظائفي', 'نشر الوظائف ومتابعة المتقدمين', '<button class="btn" id="nj">+ وظيفة جديدة</button>');
+  $('nj').onclick = function () {
+    Promise.all([meta('accommodations').catch(function () { return []; })]).then(function (r) {
+      var acc = items(r[0]);
+      var o = modal('<h3>نشر وظيفة</h3><div class="col" style="gap:8px"><label class="fld">العنوان<input id="nj_t"></label><label class="fld">الوصف<textarea id="nj_d" rows="3"></textarea></label><div class="row"><label class="fld" style="flex:1">النوع<select id="nj_e">' + Object.keys(ET).map(function (k) { return '<option value="' + k + '">' + ET[k] + '</option>'; }).join('') + '</select></label><label class="fld" style="flex:1">نمط العمل<select id="nj_w">' + Object.keys(WA).map(function (k) { return '<option value="' + k + '">' + WA[k] + '</option>'; }).join('') + '</select></label></div><label class="fld">المكان<input id="nj_l"></label><label class="fld">معلومات الإتاحة في بيئة العمل<textarea id="nj_a" rows="2"></textarea></label>' + (acc.length ? '<div>التيسيرات المتاحة:</div><div class="chips" id="nj_acc">' + acc.map(function (a) { return '<span class="chip" data-i="' + (a.accommodationId || a.id) + '">' + esc(a.nameAr || a.name) + '</span>'; }).join('') + '</div>' : '') + '<button class="btn" id="nj_go">نشر</button></div>');
+      var sel = [];
+      document.querySelectorAll('#nj_acc .chip').forEach(function (c) { c.onclick = function () { var i = +c.getAttribute('data-i'), k = sel.indexOf(i); if (k >= 0) sel.splice(k, 1); else sel.push(i); c.classList.toggle('on'); }; });
+      $('nj_go').onclick = function () { act($('nj_go'), function () { return api('/jobs', { method: 'POST', body: { title: val('nj_t'), description: val('nj_d'), employmentType: val('nj_e'), workArrangement: val('nj_w'), location: val('nj_l'), accessibilityInformation: val('nj_a'), accommodationIds: sel } }); }, 'تم النشر').then(function () { o.remove(); myJobsPage(); }, function () { }); };
+    });
+  };
+  api('/jobs/mine').then(function (l) { body(l.length ? l.map(function (j) { return jobCard(j, 'owner'); }).join('') : empty('لسه ما نشرتش وظائف. (لازم الجهة تكون معتمدة)')); }).catch(function (e) { body('<div class="note e">' + esc(e.message) + '</div>'); });
+}
+function jobAppsPage(id) {
+  layout('myjobs', 'المتقدمين على الوظيفة', '');
+  api('/jobs/' + id + '/applications').then(function (l) {
+    var cols = [['submitted', 'اتقدم'], ['reviewing', 'قيد المراجعة'], ['interview', 'مقابلة'], ['accepted', 'مقبول'], ['rejected', 'مرفوض']];
+    body('<a href="#/myjobs">← رجوع</a>' + (l.length ? '<div class="row" style="align-items:flex-start;overflow:auto">' + cols.map(function (c) { var m = l.filter(function (a) { return a.status === c[0]; }); return '<div class="col" style="min-width:230px;flex:1"><b>' + c[1] + ' (' + m.length + ')</b>' + m.map(function (a) { return '<div class="card col" style="gap:6px;padding:12px"><b>' + esc(a.applicantName) + '</b><div style="font-size:14px;white-space:pre-wrap">' + esc(a.applicationText) + '</div>' + (a.voluntarilySharedNeeds ? '<div class="note i">احتياجات: ' + esc(a.voluntarilySharedNeeds) + '</div>' : '') + '<select onchange="A.appSt(\'' + a.applicationId + '\',this.value,\'' + id + '\')"><option value="">نقل إلى…</option>' + cols.filter(function (z) { return z[0] !== 'submitted' && z[0] !== a.status; }).map(function (z) { return '<option value="' + z[0] + '">' + z[1] + '</option>'; }).join('') + '</select></div>'; }).join('') + '</div>'; }).join('') + '</div>' : empty('لسه مفيش متقدمين.')));
+  }).catch(errBox);
+}
+A.appSt = function (aid, st, jid) { if (!st) return; api('/jobs/applications/' + aid + '/status', { method: 'PUT', body: { status: st } }).then(function () { toast('تم النقل'); jobAppsPage(jid); }).catch(fail); };
+
 /* ---------- organization ---------- */
 var DOCS = [['commercial_register', 'السجل التجاري'], ['tax_card', 'البطاقة الضريبية'], ['address_proof', 'إثبات العنوان'], ['license', 'ترخيص (اختياري)']];
 function orgHome() {
@@ -660,11 +713,11 @@ function admAudit() {
 
 /* ---------- router ---------- */
 var PAGES = {
-  volunteer: { feed: feedPage, communities: communitiesPage, home: volHome, verification: volVerification, interview: volInterview, availability: volAvailability, training: volTraining, open: volOpen, mine: volMine, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
-  disabled_user: { feed: feedPage, communities: communitiesPage, home: duHome, needs: duNeeds, requests: duRequests, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
-  association: { feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
-  company: { feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
-  admin: { feed: feedPage, moderation: admModeration, home: admHome, vreviews: function () { admList('volunteer', 'vreviews', 'مراجعة المتطوعين'); }, oreviews: function () { admList('organization', 'oreviews', 'مراجعة الجمعيات والشركات'); }, slots: admSlots, users: admUsers, deletions: admDeletions, leads: admLeads, audit: admAudit, notifications: notificationsPage, settings: settingsPage }
+  volunteer: { jobs: jobsPage, feed: feedPage, communities: communitiesPage, home: volHome, verification: volVerification, interview: volInterview, availability: volAvailability, training: volTraining, open: volOpen, mine: volMine, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
+  disabled_user: { myapps: myAppsPage, jobs: jobsPage, feed: feedPage, communities: communitiesPage, home: duHome, needs: duNeeds, requests: duRequests, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
+  association: { myjobs: myJobsPage, jobs: jobsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
+  company: { myjobs: myJobsPage, jobs: jobsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
+  admin: { jobs: jobsPage, feed: feedPage, moderation: admModeration, home: admHome, vreviews: function () { admList('volunteer', 'vreviews', 'مراجعة المتطوعين'); }, oreviews: function () { admList('organization', 'oreviews', 'مراجعة الجمعيات والشركات'); }, slots: admSlots, users: admUsers, deletions: admDeletions, leads: admLeads, audit: admAudit, notifications: notificationsPage, settings: settingsPage }
 };
 function route() {
   var h = (location.hash || '').replace(/^#\/?/, '');
@@ -676,6 +729,7 @@ function route() {
     return loginPage();
   }
   if (p === 'login' || p === 'register' || p === 'forgot' || !p) { location.hash = '#/home'; return; }
+  if (p === 'jobapps' && parts[1] && (auth.role === 'company' || auth.role === 'association')) return loadUnread().then(function () { jobAppsPage(parts[1]); }, function () { jobAppsPage(parts[1]); });
   if (p === 'post' && parts[1]) return loadUnread().then(function () { postPage(parts[1]); }, function () { postPage(parts[1]); });
   if (p === 'user' && parts[1]) return loadUnread().then(function () { userPage(parts[1]); }, function () { userPage(parts[1]); });
   if (p === 'request' && parts[1] && (auth.role === 'volunteer' || auth.role === 'disabled_user')) return loadUnread().then(function () { requestPage(parts[1]); }, function () { requestPage(parts[1]); });
