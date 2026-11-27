@@ -153,11 +153,11 @@ function forgotPage() {
 
 /* ---------- layout ---------- */
 var NAV = {
-  volunteer: [['home', 'الرئيسية'], ['verification', 'حالة التحقق'], ['interview', 'المقابلة'], ['availability', 'مواعيد التطوع'], ['training', 'التدريب'], ['open', 'طلبات مفتوحة'], ['mine', 'عروضي ومحادثاتي'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  disabled_user: [['home', 'الرئيسية'], ['needs', 'احتياجاتي وإعدادات الوصول'], ['requests', 'طلبات المساعدة'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  association: [['home', 'الرئيسية'], ['org', 'بيانات الجمعية'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  company: [['home', 'الرئيسية'], ['org', 'بيانات الشركة'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  admin: [['home', 'نظرة عامة'], ['vreviews', 'مراجعة المتطوعين'], ['oreviews', 'مراجعة الجهات'], ['slots', 'مواعيد المقابلات'], ['users', 'المستخدمون'], ['deletions', 'طلبات حذف الحساب'], ['leads', 'طلبات الموقع'], ['audit', 'سجل العمليات'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']]
+  volunteer: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['verification', 'حالة التحقق'], ['interview', 'المقابلة'], ['availability', 'مواعيد التطوع'], ['training', 'التدريب'], ['open', 'طلبات مفتوحة'], ['mine', 'عروضي ومحادثاتي'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  disabled_user: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['needs', 'احتياجاتي وإعدادات الوصول'], ['requests', 'طلبات المساعدة'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  association: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['org', 'بيانات الجمعية'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  company: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['org', 'بيانات الشركة'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  admin: [['home', 'نظرة عامة'], ['feed', 'التايم لاين'], ['moderation', 'المجتمعات والبلاغات'], ['vreviews', 'مراجعة المتطوعين'], ['oreviews', 'مراجعة الجهات'], ['slots', 'مواعيد المقابلات'], ['users', 'المستخدمون'], ['deletions', 'طلبات حذف الحساب'], ['leads', 'طلبات الموقع'], ['audit', 'سجل العمليات'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']]
 };
 var unread = 0;
 function layout(page, title, sub, actionsHtml) {
@@ -442,6 +442,62 @@ function requestPage(id) {
   }).catch(errBox);
 }
 
+/* ---------- social ---------- */
+var RX = { like: '👍 إعجاب', support: '💛 دعم', thanks: '🙏 شكرًا' };
+var feedFl = { c: '', following: false };
+function postCard(p, full) {
+  return '<div class="card col" style="gap:8px"><div style="display:flex;gap:10px;align-items:center"><div class="av" style="width:38px;height:38px">' + esc((p.authorName || 'م').slice(0, 1)) + '</div><div style="flex:1"><a href="#/user/' + p.authorId + '"><b>' + esc(p.authorName) + '</b></a> ' + tag('tn', ROLE_AR[p.authorRole] || '') + '<br><small style="color:var(--muted)">' + esc(p.communityName) + ' · ' + dt(p.createdAt) + '</small></div></div>' +
+    '<div style="white-space:pre-wrap;font-size:16px">' + esc(p.body) + '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' + Object.keys(RX).map(function (k) { return '<button class="btn s ' + (p.myReaction === k ? '' : 'g') + '" onclick="A.react(\'' + p.postId + '\',\'' + k + '\',' + (p.myReaction === k) + ',' + (full ? 1 : 0) + ')">' + RX[k] + '</button>'; }).join('') + '<small style="color:var(--muted)">' + p.reactionsCount + ' تفاعل</small>' + (full ? '' : '<a class="btn s g" href="#/post/' + p.postId + '">💬 ' + p.commentsCount + ' تعليق</a>') + '<button class="btn s g" onclick="A.reportPost(\'' + p.postId + '\')">إبلاغ</button>' + (p.authorId === auth.userId ? '<button class="btn s g" onclick="A.delPost(\'' + p.postId + '\')">حذف</button>' : '') + '</div></div>';
+}
+A.react = function (id, k, on, full) { api('/social/posts/' + id + '/reaction', on ? { method: 'DELETE' } : { method: 'PUT', body: { type: k } }).then(function () { full ? postPage(id) : feedPage(); }).catch(fail); };
+A.reportPost = function (id) { var t = prompt('سبب البلاغ:'); if (!t) return; api('/social/posts/' + id + '/report', { method: 'POST', body: { reason: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); };
+A.reportComment = function (id) { var t = prompt('سبب البلاغ:'); if (!t) return; api('/social/comments/' + id + '/report', { method: 'POST', body: { reason: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); };
+A.delPost = function (id) { if (!confirm('حذف البوست؟')) return; api('/social/posts/' + id, { method: 'DELETE' }).then(function () { toast('تم الحذف'); location.hash = '#/feed'; feedPage(); }).catch(fail); };
+function feedPage() {
+  layout('feed', 'التايم لاين', 'أخبار ومشاركات المجتمع');
+  Promise.all([api('/social/communities'), api('/social/posts?pageSize=30' + (feedFl.c ? '&communityId=' + feedFl.c : '') + (feedFl.following ? '&following=true' : ''))]).then(function (r) {
+    var cs = r[0] || [], l = items(r[1]), joined = cs.filter(function (c) { return c.joined; });
+    var comp = auth.role === 'admin' ? '' : (joined.length ? '<div class="card col"><textarea id="pf_t" rows="3" placeholder="شارك حاجة مع المجتمع…"></textarea><div style="display:flex;gap:8px"><select id="pf_c" style="flex:1">' + joined.map(function (c) { return '<option value="' + c.communityId + '">' + esc(c.name) + '</option>'; }).join('') + '</select><button class="btn" id="pf_go">نشر</button></div></div>' : '<div class="note i">انضم لمجتمع من صفحة "المجتمعات" عشان تقدر تنشر.</div>');
+    var tabs = '<div class="tabs"><span class="' + (!feedFl.c && !feedFl.following ? 'on' : '') + '" data-k="all">الكل</span><span class="' + (feedFl.following ? 'on' : '') + '" data-k="fol">المتابَعين</span>' + cs.map(function (c) { return '<span class="' + (feedFl.c === c.communityId ? 'on' : '') + '" data-k="' + c.communityId + '">' + esc(c.name) + '</span>'; }).join('') + '</div>';
+    body(tabs + comp + (l.length ? l.map(function (p) { return postCard(p, false); }).join('') : empty('مفيش بوستات لسه.')));
+    document.querySelectorAll('.tabs span').forEach(function (e) { e.onclick = function () { var k = e.getAttribute('data-k'); feedFl.following = k === 'fol'; feedFl.c = (k === 'all' || k === 'fol') ? '' : k; feedPage(); }; });
+    if ($('pf_go')) $('pf_go').onclick = function () { act($('pf_go'), function () { return api('/social/posts', { method: 'POST', body: { communityId: val('pf_c'), body: val('pf_t') } }); }, 'تم النشر').then(feedPage, function () { }); };
+  }).catch(errBox);
+}
+function postPage(id) {
+  layout('feed', 'بوست', '');
+  api('/social/posts/' + id).then(function (d) {
+    body('<a href="#/feed">← رجوع</a>' + postCard(d.post, true) + '<div class="card col"><h3>التعليقات (' + d.comments.length + ')</h3>' + d.comments.map(function (c) { return '<div style="padding:8px 0;border-top:1px solid #eee"><b>' + esc(c.authorName) + '</b> <small style="color:var(--muted)">' + dt(c.createdAt) + '</small> <a style="font-size:12px" onclick="A.reportComment(\'' + c.commentId + '\')">إبلاغ</a><div>' + esc(c.body) + '</div></div>'; }).join('') + (auth.role === 'admin' ? '' : '<div style="display:flex;gap:8px"><input id="cm_t" style="flex:1" placeholder="اكتب تعليق…"><button class="btn" id="cm_go">إرسال</button></div>') + '</div>');
+    if ($('cm_go')) $('cm_go').onclick = function () { act($('cm_go'), function () { return api('/social/posts/' + id + '/comments', { method: 'POST', body: { body: val('cm_t') } }); }).then(function () { postPage(id); }, function () { }); };
+  }).catch(errBox);
+}
+function communitiesPage() {
+  layout('communities', 'المجتمعات', 'انضم لمجتمعات تهمك');
+  api('/social/communities').then(function (cs) {
+    body(cs.length ? cs.map(function (c) { return '<div class="card col" style="gap:6px"><div style="display:flex;gap:8px;align-items:center"><h3 style="flex:1;margin:0">' + esc(c.name) + '</h3><button class="btn s ' + (c.joined ? 'g' : '') + '" onclick="A.joinC(\'' + c.communityId + '\',' + c.joined + ')">' + (c.joined ? 'مغادرة' : 'انضمام') + '</button></div><div>' + esc(c.description) + '</div><small style="color:var(--muted)">' + c.membersCount + ' عضو · ' + c.postsCount + ' بوست</small><details><summary>قواعد المجتمع</summary><div style="white-space:pre-wrap">' + esc(c.rules) + '</div></details></div>'; }).join('') : empty('لسه مفيش مجتمعات.'));
+  }).catch(errBox);
+}
+A.joinC = function (id, joined) { api('/social/communities/' + id + '/join', { method: joined ? 'DELETE' : 'POST' }).then(function () { toast(joined ? 'تمت المغادرة' : 'تم الانضمام'); communitiesPage(); }).catch(fail); };
+function userPage(id) {
+  layout('feed', 'الملف العام', '');
+  Promise.all([api('/social/users/' + id), api('/social/posts?authorId=' + id + '&pageSize=30')]).then(function (r) {
+    var u = r[0], l = items(r[1]);
+    body('<a href="#/feed">← رجوع</a><div class="card" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div class="av" style="width:56px;height:56px;font-size:22px">' + esc(u.displayName.slice(0, 1)) + '</div><div style="flex:1"><div style="font-size:20px;font-weight:800">' + esc(u.displayName) + '</div>' + tag('tn', ROLE_AR[u.role] || '') + '<br><small style="color:var(--muted)">' + u.followersCount + ' متابِع · ' + u.followingCount + ' بيتابع · ' + u.postsCount + ' بوست</small></div>' + (u.isMe ? '' : '<button class="btn ' + (u.isFollowing ? 'g' : '') + '" id="fo">' + (u.isFollowing ? 'إلغاء المتابعة' : 'متابعة') + '</button>') + '</div>' + (l.length ? l.map(function (p) { return postCard(p, false); }).join('') : empty('مفيش بوستات.')));
+    if ($('fo')) $('fo').onclick = function () { api('/social/users/' + id + '/follow', { method: u.isFollowing ? 'DELETE' : 'PUT' }).then(function () { userPage(id); }).catch(fail); };
+  }).catch(errBox);
+}
+function admModeration() {
+  layout('moderation', 'المجتمعات والبلاغات', 'إنشاء مجتمعات ومراجعة البلاغات');
+  Promise.all([api('/social/communities'), api('/social/reports?status=open')]).then(function (r) {
+    var cs = r[0] || [], rp = r[1] || [];
+    body('<div class="row"><div class="card col" style="flex:1"><h3>مجتمع جديد</h3><label class="fld">الاسم<input id="cm_n"></label><label class="fld">الوصف<textarea id="cm_d" rows="2"></textarea></label><label class="fld">القواعد<textarea id="cm_r" rows="3"></textarea></label><button class="btn" id="cm_go">إنشاء</button><small style="color:var(--muted)">الموجود: ' + (cs.map(function (c) { return esc(c.name); }).join('، ') || 'لا يوجد') + '</small></div>' +
+      '<div class="card" style="flex:1.6"><h3>بلاغات مفتوحة (' + rp.length + ')</h3>' + (rp.length ? rp.map(function (x) { return '<div style="padding:10px 0;border-top:1px solid #eee"><div>' + tag('tw', x.postId ? 'بوست' : 'تعليق') + ' <b>' + esc(x.reporterName) + '</b>: ' + esc(x.reason) + '</div><div style="background:#FBF8F5;border-radius:8px;padding:8px;margin:6px 0;white-space:pre-wrap">' + esc(x.targetText) + '</div><button class="btn s" onclick="A.resRep(\'' + x.reportId + '\',true)">إخفاء المحتوى</button> <button class="btn s g" onclick="A.resRep(\'' + x.reportId + '\',false)">تجاهل</button></div>'; }).join('') : empty('مفيش بلاغات.')) + '</div></div>');
+    $('cm_go').onclick = function () { act($('cm_go'), function () { return api('/social/communities', { method: 'POST', body: { name: val('cm_n'), description: val('cm_d'), rules: val('cm_r') } }); }, 'تم الإنشاء').then(admModeration, function () { }); };
+  }).catch(errBox);
+}
+A.resRep = function (id, hide) { var n = prompt('ملاحظة القرار (اختياري):') || ''; api('/social/reports/' + id + '/resolve', { method: 'POST', body: { hide: hide, resolution: n } }).then(function () { toast('تم'); admModeration(); }).catch(fail); };
+
 /* ---------- organization ---------- */
 var DOCS = [['commercial_register', 'السجل التجاري'], ['tax_card', 'البطاقة الضريبية'], ['address_proof', 'إثبات العنوان'], ['license', 'ترخيص (اختياري)']];
 function orgHome() {
@@ -604,11 +660,11 @@ function admAudit() {
 
 /* ---------- router ---------- */
 var PAGES = {
-  volunteer: { home: volHome, verification: volVerification, interview: volInterview, availability: volAvailability, training: volTraining, open: volOpen, mine: volMine, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
-  disabled_user: { home: duHome, needs: duNeeds, requests: duRequests, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
-  association: { home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
-  company: { home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
-  admin: { home: admHome, vreviews: function () { admList('volunteer', 'vreviews', 'مراجعة المتطوعين'); }, oreviews: function () { admList('organization', 'oreviews', 'مراجعة الجمعيات والشركات'); }, slots: admSlots, users: admUsers, deletions: admDeletions, leads: admLeads, audit: admAudit, notifications: notificationsPage, settings: settingsPage }
+  volunteer: { feed: feedPage, communities: communitiesPage, home: volHome, verification: volVerification, interview: volInterview, availability: volAvailability, training: volTraining, open: volOpen, mine: volMine, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
+  disabled_user: { feed: feedPage, communities: communitiesPage, home: duHome, needs: duNeeds, requests: duRequests, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
+  association: { feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
+  company: { feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
+  admin: { feed: feedPage, moderation: admModeration, home: admHome, vreviews: function () { admList('volunteer', 'vreviews', 'مراجعة المتطوعين'); }, oreviews: function () { admList('organization', 'oreviews', 'مراجعة الجمعيات والشركات'); }, slots: admSlots, users: admUsers, deletions: admDeletions, leads: admLeads, audit: admAudit, notifications: notificationsPage, settings: settingsPage }
 };
 function route() {
   var h = (location.hash || '').replace(/^#\/?/, '');
@@ -620,6 +676,8 @@ function route() {
     return loginPage();
   }
   if (p === 'login' || p === 'register' || p === 'forgot' || !p) { location.hash = '#/home'; return; }
+  if (p === 'post' && parts[1]) return loadUnread().then(function () { postPage(parts[1]); }, function () { postPage(parts[1]); });
+  if (p === 'user' && parts[1]) return loadUnread().then(function () { userPage(parts[1]); }, function () { userPage(parts[1]); });
   if (p === 'request' && parts[1] && (auth.role === 'volunteer' || auth.role === 'disabled_user')) return loadUnread().then(function () { requestPage(parts[1]); }, function () { requestPage(parts[1]); });
   if (auth.role === 'admin' && p === 'vreview') return admVReview(parts[1]);
   if (auth.role === 'admin' && p === 'oreview') return admOReview(parts[1]);
