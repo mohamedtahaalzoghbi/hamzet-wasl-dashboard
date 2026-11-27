@@ -141,9 +141,13 @@ function otpPage() {
   };
   $('ot_re').onclick = function () { act($('ot_re'), function () { return api('/auth/register/resend', { method: 'POST', anon: true, body: { registrationTicket: reg.ticket } }); }, 'تم إرسال كود جديد'); };
 }
+function resetPage() {
+  authShell('<h3>كلمة مرور جديدة</h3><label class="fld">البريد الإلكتروني<input id="rs_email" type="email" value="' + esc(reg.fpEmail || '') + '"></label><label class="fld">الكود اللي وصلك<input id="rs_tok" dir="ltr"></label><label class="fld">كلمة المرور الجديدة<input id="rs_pw" type="password"></label><label class="fld">تأكيد كلمة المرور<input id="rs_pw2" type="password"></label><button class="btn" id="rs_go" style="padding:12px">حفظ</button><div style="font-size:14px"><a href="#/login">رجوع لتسجيل الدخول</a></div>');
+  $('rs_go').onclick = function () { act($('rs_go'), function () { return api('/auth/reset-password', { method: 'POST', anon: true, body: { email: val('rs_email'), token: val('rs_tok'), newPassword: $('rs_pw').value, confirmPassword: $('rs_pw2').value } }); }, 'تم تغيير كلمة المرور، سجّل دخول').then(function () { location.hash = '#/login'; }, function () { }); };
+}
 function forgotPage() {
   authShell('<h3>استرجاع كلمة المرور</h3><label class="fld">البريد الإلكتروني<input id="fp_email" type="email"></label><button class="btn" id="fp_go" style="padding:12px">إرسال</button><div id="fp_msg" class="note ok" style="display:none">لو الحساب موجود هيوصلك كود على بريدك.</div><div style="font-size:14px"><a href="#/login">رجوع</a></div>');
-  $('fp_go').onclick = function () { act($('fp_go'), function () { return api('/auth/forgot-password', { method: 'POST', anon: true, body: { email: val('fp_email') } }); }).then(function () { $('fp_msg').style.display = 'block'; }); };
+  $('fp_go').onclick = function () { act($('fp_go'), function () { return api('/auth/forgot-password', { method: 'POST', anon: true, body: { email: val('fp_email') } }); }).then(function () { reg.fpEmail = val('fp_email'); $('fp_msg').style.display = 'block'; $('fp_msg').innerHTML += ' <a href="#/reset"><b>عندي الكود</b></a>'; }, function () { }); };
 }
 
 /* ---------- layout ---------- */
@@ -549,6 +553,7 @@ function route() {
   if (!auth) {
     if (p === 'register') return registerPage();
     if (p === 'forgot') return forgotPage();
+    if (p === 'reset') return resetPage();
     return loginPage();
   }
   if (p === 'login' || p === 'register' || p === 'forgot' || !p) { location.hash = '#/home'; return; }
