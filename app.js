@@ -153,7 +153,7 @@ function forgotPage() {
 
 /* ---------- layout ---------- */
 var NAV = {
-  volunteer: [['home', 'الرئيسية'], ['verification', 'حالة التحقق'], ['interview', 'المقابلة'], ['availability', 'مواعيد التطوع'], ['training', 'التدريب'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  volunteer: [['home', 'الرئيسية'], ['verification', 'حالة التحقق'], ['interview', 'المقابلة'], ['availability', 'مواعيد التطوع'], ['training', 'التدريب'], ['open', 'طلبات مفتوحة'], ['mine', 'عروضي ومحادثاتي'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
   disabled_user: [['home', 'الرئيسية'], ['needs', 'احتياجاتي وإعدادات الوصول'], ['requests', 'طلبات المساعدة'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
   association: [['home', 'الرئيسية'], ['org', 'بيانات الجمعية'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
   company: [['home', 'الرئيسية'], ['org', 'بيانات الشركة'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
@@ -382,9 +382,64 @@ function duNeeds() {
     if ($('ac_del')) $('ac_del').onclick = function () { if (!confirm('هتتمسح إعدادات الوصول بتاعتك. متأكد؟')) return; act($('ac_del'), function () { return api('/me/accessibility', { method: 'DELETE' }); }, 'تم الحذف').then(function () { applyA11y(null); duNeeds(); }); };
   }).catch(errBox);
 }
+var HCAT = { reading: 'قراءة', accompaniment: 'مرافقة', explanation: 'شرح', other: 'أخرى' };
+var HSTAT = { open: ['tw', 'مفتوح'], assigned: ['tg', 'اتقبل'], in_progress: ['tg', 'شغال'], completed: ['tg', 'مكتمل'], cancelled: ['tn', 'ملغي'], canceled: ['tn', 'ملغي'] };
+function hst(s) { var x = HSTAT[s]; return x ? tag(x[0], x[1]) : tag('tn', s || '—'); }
+function reqCard(r, href) { return '<a class="card" href="' + href + '" style="display:block;color:inherit;text-decoration:none"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>' + esc(HCAT[r.category] || r.category) + '</b>' + hst(r.status) + (r.urgency === 'urgent' ? tag('tr', 'مستعجل') : '') + tag('tn', r.helpMode === 'field' ? 'ميداني' : 'أونلاين') + '</div><p style="margin:8px 0">' + esc(r.description || '') + '</p><small style="color:var(--muted)">' + esc(r.approximateArea) + ' · ' + dt(r.createdAt) + ' · ' + (r.offersCount || 0) + ' عرض</small></a>'; }
 function duRequests() {
-  layout('requests', 'طلبات المساعدة', 'المرحلة الثانية');
-  body('<div class="card" style="text-align:center;padding:40px"><div class="ph" style="width:90px;height:90px;border-radius:50%;margin:auto">⏳</div><h3 style="margin-top:14px">قريبًا</h3><p style="color:var(--muted);max-width:480px;margin:auto">طلب مساعدة من متطوع قريب هيتفعّل في المرحلة الثانية من همزة وصل. حاليًا تقدر تحدد احتياجاتك وإعدادات الوصول.</p><a class="btn" href="#/needs">احتياجاتي</a></div>');
+  layout('requests', 'طلبات المساعدة', 'اطلب مساعدة من متطوع معتمد', '<button class="btn" id="hr_new">+ طلب جديد</button>');
+  $('hr_new').onclick = function () {
+    var o = modal('<h3>طلب مساعدة جديد</h3><div class="col" style="gap:10px"><label class="fld">النوع<select id="hr_mode"><option value="online">أونلاين</option><option value="field">ميداني (وجهًا لوجه)</option></select></label><label class="fld">التصنيف<select id="hr_cat">' + Object.keys(HCAT).map(function (k) { return '<option value="' + k + '">' + HCAT[k] + '</option>'; }).join('') + '</select></label><label class="fld">وصف الطلب<textarea id="hr_desc" rows="3"></textarea></label><label class="fld">المنطقة التقريبية (من غير عنوان تفصيلي)<input id="hr_area" placeholder="مثال: مدينة نصر، القاهرة"></label><label class="fld">الاستعجال<select id="hr_urg"><option value="normal">عادي</option><option value="urgent">مستعجل</option></select></label><button class="btn" id="hr_go">إرسال الطلب</button></div>');
+    $('hr_go').onclick = function () { act($('hr_go'), function () { return api('/help/requests', { method: 'POST', body: { helpMode: val('hr_mode'), category: val('hr_cat'), description: val('hr_desc') || null, approximateArea: val('hr_area'), urgency: val('hr_urg') } }); }, 'تم إرسال الطلب').then(function () { o.remove(); duRequests(); }, function () { }); };
+  };
+  api('/help/requests/mine?page=1&pageSize=50').then(function (r) {
+    var l = items(r);
+    body(l.length ? '<div class="col" style="gap:12px">' + l.map(function (x) { return reqCard(x, '#/request/' + x.requestId); }).join('') + '</div>' : empty('لسه مفيش طلبات. اضغط "طلب جديد".'));
+  }).catch(errBox);
+}
+function volOpen() {
+  layout('open', 'طلبات المساعدة المفتوحة', 'اختار طلب وقدّم عرضك');
+  api('/help/requests/open?page=1&pageSize=50').then(function (r) {
+    var l = items(r);
+    body(l.length ? '<div class="col" style="gap:12px">' + l.map(function (x) { return reqCard(x, '#/request/' + x.requestId); }).join('') + '</div>' : empty('مفيش طلبات مفتوحة حاليًا. هيوصلك إشعار لما يجي طلب.'));
+  }).catch(function (e) { body('<div class="note e">' + esc(e.message) + (auth.role === 'volunteer' ? ' (لازم حسابك يكون معتمد كمتطوع)' : '') + '</div>'); });
+}
+function volMine() {
+  layout('mine', 'عروضي ومحادثاتي', 'الطلبات اللي اشتغلت عليها');
+  api('/help/requests/mine?page=1&pageSize=50').then(function (r) {
+    var l = items(r);
+    body(l.length ? '<div class="col" style="gap:12px">' + l.map(function (x) { return reqCard(x, '#/request/' + x.requestId); }).join('') + '</div>' : empty('لسه ما قدمتش عروض.'));
+  }).catch(errBox);
+}
+function requestPage(id) {
+  var home = auth.role === 'volunteer' ? 'open' : 'requests';
+  layout(home, 'تفاصيل الطلب', '');
+  api('/help/requests/' + id).then(function (d) {
+    var r = d.request, isDu = auth.role === 'disabled_user', mine = (d.assignedVolunteerName != null);
+    var h = '<a href="#/' + home + '">← رجوع</a>' + reqCard(r, '#/request/' + id).replace('<a ', '<div ').replace('</a>', '</div>').replace(/href="[^"]*"/, '');
+    if (isDu && r.status === 'open') {
+      h += '<div class="card"><h3>العروض (' + d.offers.length + ')</h3>' + (d.offers.length ? d.offers.map(function (o) { return '<div style="padding:10px 0;border-top:1px solid var(--line,#eee)"><b>' + esc(o.volunteerName) + '</b> ' + (o.averageRating ? '⭐ ' + o.averageRating.toFixed(1) + ' (' + o.ratingsCount + ')' : '') + '<p>' + esc(o.message || '') + '</p><button class="btn s" data-acc="' + o.offerId + '">اقبل العرض</button></div>'; }).join('') : empty('لسه مفيش عروض.')) + '</div><button class="btn g" id="hr_cancel">إلغاء الطلب</button>';
+    }
+    if (!isDu && r.status === 'open') {
+      h += r.hasOffered ? '<div class="note i">قدّمت عرض على الطلب ده، مستني رد صاحب الطلب.</div>' : '<div class="card col"><h3>قدّم عرضك</h3><label class="fld">رسالة قصيرة<textarea id="of_msg" rows="2"></textarea></label><button class="btn" id="of_go">إرسال العرض</button></div>';
+    }
+    if (d.chatOpen) {
+      h += '<div class="card"><h3>المحادثة' + (d.assignedVolunteerName ? ' مع ' + esc(isDu ? d.assignedVolunteerName : r.requesterName) : '') + '</h3><div id="ch_list" class="col" style="gap:8px;max-height:320px;overflow:auto"></div><div style="display:flex;gap:8px;margin-top:10px"><input id="ch_txt" style="flex:1" placeholder="اكتب رسالة…"><button class="btn" id="ch_send">إرسال</button></div></div>';
+      h += '<div class="card col"><h3>بعد المساعدة</h3>' + (isDu && r.status !== 'completed' ? '<button class="btn" id="hr_done">تم إنجاز المساعدة</button>' : '') + (r.status === 'completed' ? '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><select id="fb_r"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><input id="fb_c" placeholder="تعليق (اختياري)" style="flex:1"><button class="btn s" id="fb_go">تقييم</button></div>' : '') + '<button class="btn g s" id="sr_go" style="width:max-content">إبلاغ عن مشكلة أمان</button></div>';
+    }
+    body('<div class="col" style="gap:12px">' + h + '</div>');
+    document.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { act(b, function () { return api('/help/requests/' + id + '/accept', { method: 'POST', body: { offerId: b.getAttribute('data-acc') } }); }, 'تم قبول العرض').then(function () { requestPage(id); }, function () { }); }; });
+    if ($('hr_cancel')) $('hr_cancel').onclick = function () { if (!confirm('إلغاء الطلب؟')) return; act($('hr_cancel'), function () { return api('/help/requests/' + id + '/cancel', { method: 'POST' }); }, 'تم الإلغاء').then(function () { location.hash = '#/requests'; }, function () { }); };
+    if ($('of_go')) $('of_go').onclick = function () { act($('of_go'), function () { return api('/help/requests/' + id + '/offers', { method: 'POST', body: { message: val('of_msg') || null } }); }, 'تم إرسال العرض').then(function () { requestPage(id); }, function () { }); };
+    if ($('hr_done')) $('hr_done').onclick = function () { act($('hr_done'), function () { return api('/help/requests/' + id + '/complete', { method: 'POST' }); }, 'تم').then(function () { requestPage(id); }, function () { }); };
+    if ($('fb_go')) $('fb_go').onclick = function () { act($('fb_go'), function () { return api('/help/requests/' + id + '/feedback', { method: 'POST', body: { rating: +val('fb_r'), comment: val('fb_c') || null } }); }, 'شكرًا على تقييمك').then(function () { $('fb_go').disabled = true; }, function () { }); };
+    if ($('sr_go')) $('sr_go').onclick = function () { var t = prompt('اوصف المشكلة:'); if (!t) return; api('/help/requests/' + id + '/safety-report', { method: 'POST', body: { description: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); };
+    if (d.chatOpen) {
+      var load = function () { api('/help/requests/' + id + '/messages').then(function (m) { var el = $('ch_list'); if (!el) return; el.innerHTML = items(m).map(function (x) { var me = x.senderId === auth.userId; return '<div style="align-self:' + (me ? 'flex-start' : 'flex-end') + ';background:' + (me ? '#E7F2ED' : '#FBF8F5') + ';border-radius:12px;padding:8px 12px;max-width:80%"><small style="color:var(--muted)">' + esc(x.senderName) + '</small><br>' + esc(x.text) + '</div>'; }).join('') || empty('ابدأ المحادثة.'); el.scrollTop = el.scrollHeight; }).catch(function () { }); };
+      load();
+      $('ch_send').onclick = function () { var t = val('ch_txt'); if (!t) return; act($('ch_send'), function () { return api('/help/requests/' + id + '/messages', { method: 'POST', body: { text: t } }); }).then(function () { $('ch_txt').value = ''; load(); }, function () { }); };
+    }
+  }).catch(errBox);
 }
 
 /* ---------- organization ---------- */
@@ -542,7 +597,7 @@ function admAudit() {
 
 /* ---------- router ---------- */
 var PAGES = {
-  volunteer: { home: volHome, verification: volVerification, interview: volInterview, availability: volAvailability, training: volTraining, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
+  volunteer: { home: volHome, verification: volVerification, interview: volInterview, availability: volAvailability, training: volTraining, open: volOpen, mine: volMine, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
   disabled_user: { home: duHome, needs: duNeeds, requests: duRequests, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
   association: { home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
   company: { home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
@@ -558,6 +613,7 @@ function route() {
     return loginPage();
   }
   if (p === 'login' || p === 'register' || p === 'forgot' || !p) { location.hash = '#/home'; return; }
+  if (p === 'request' && parts[1] && (auth.role === 'volunteer' || auth.role === 'disabled_user')) return loadUnread().then(function () { requestPage(parts[1]); }, function () { requestPage(parts[1]); });
   if (auth.role === 'admin' && p === 'vreview') return admVReview(parts[1]);
   if (auth.role === 'admin' && p === 'oreview') return admOReview(parts[1]);
   var fn = (PAGES[auth.role] || {})[p];
