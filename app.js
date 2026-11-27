@@ -170,6 +170,7 @@ function layout(page, title, sub, actionsHtml) {
 }
 function body(html) { var b = $('body'); if (b) b.innerHTML = html; }
 function errBox(e) { body('<div class="note e">' + esc(e.message || 'حصلت مشكلة') + ' <button class="btn s" onclick="location.reload()">إعادة المحاولة</button></div>'); }
+function yes(msg, cb) { var o = modal('<h3>' + esc(msg) + '</h3><div style="display:flex;gap:10px"><button class="btn" id="yes_go" style="flex:1">تأكيد</button><button class="btn g" onclick="A.closeModal()" style="flex:1">إلغاء</button></div>'); $('yes_go').onclick = function () { o.remove(); cb(); }; }
 function ask(title, optional, cb) {
   var o = modal('<h3>' + esc(title) + '</h3><div class="col" style="gap:10px"><textarea id="ask_t" rows="3"></textarea><button class="btn" id="ask_go">تأكيد</button></div>');
   $('ask_go').onclick = function () { var t = val('ask_t'); if (!t && !optional) { toast('اكتب المطلوب الأول'); return; } o.remove(); cb(t); };
@@ -384,7 +385,7 @@ function duNeeds() {
     $('ac_save').onclick = function () {
       act($('ac_save'), function () { return api('/me/accessibility', { method: 'PUT', body: { needType: sel[0], needTypes: sel, theme: $('ac_theme').value, fontScale: +$('ac_font').value, reducedMotion: $('ac_rm').checked, interactionMode: $('ac_im').value, notificationMode: $('ac_nm').value } }); }, 'تم الحفظ').then(function (r) { if (r && r.effectivePreset) applyA11y(r.effectivePreset); duNeeds(); });
     };
-    if ($('ac_del')) $('ac_del').onclick = function () { if (!confirm('هتتمسح إعدادات الوصول بتاعتك. متأكد؟')) return; act($('ac_del'), function () { return api('/me/accessibility', { method: 'DELETE' }); }, 'تم الحذف').then(function () { applyA11y(null); duNeeds(); }); };
+    if ($('ac_del')) $('ac_del').onclick = function () { yes('هتتمسح إعدادات الوصول بتاعتك. متأكد؟', function () { act($('ac_del'), function () { return api('/me/accessibility', { method: 'DELETE' }); }, 'تم الحذف').then(function () { applyA11y(null); duNeeds(); }); });};
   }).catch(errBox);
 }
 var HCAT = { reading: 'قراءة', accompaniment: 'مرافقة', explanation: 'شرح', other: 'أخرى' };
@@ -434,7 +435,7 @@ function requestPage(id) {
     }
     body('<div class="col" style="gap:12px">' + h + '</div>');
     document.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { act(b, function () { return api('/help/requests/' + id + '/accept', { method: 'POST', body: { offerId: b.getAttribute('data-acc') } }); }, 'تم قبول العرض').then(function () { requestPage(id); }, function () { }); }; });
-    if ($('hr_cancel')) $('hr_cancel').onclick = function () { if (!confirm('إلغاء الطلب؟')) return; act($('hr_cancel'), function () { return api('/help/requests/' + id + '/cancel', { method: 'POST' }); }, 'تم الإلغاء').then(function () { location.hash = '#/requests'; }, function () { }); };
+    if ($('hr_cancel')) $('hr_cancel').onclick = function () { yes('إلغاء الطلب؟', function () { act($('hr_cancel'), function () { return api('/help/requests/' + id + '/cancel', { method: 'POST' }); }, 'تم الإلغاء').then(function () { location.hash = '#/requests'; }, function () { }); });};
     if ($('of_go')) $('of_go').onclick = function () { act($('of_go'), function () { return api('/help/requests/' + id + '/offers', { method: 'POST', body: { message: val('of_msg') || null } }); }, 'تم إرسال العرض').then(function () { requestPage(id); }, function () { }); };
     if ($('hr_done')) $('hr_done').onclick = function () { act($('hr_done'), function () { return api('/help/requests/' + id + '/complete', { method: 'POST' }); }, 'تم').then(function () { requestPage(id); }, function () { }); };
     if ($('fb_go')) $('fb_go').onclick = function () { act($('fb_go'), function () { return api('/help/requests/' + id + '/feedback', { method: 'POST', body: { rating: +val('fb_r'), comment: val('fb_c') || null } }); }, 'شكرًا على تقييمك').then(function () { $('fb_go').disabled = true; }, function () { }); };
@@ -458,7 +459,7 @@ function postCard(p, full) {
 A.react = function (id, k, on, full) { api('/social/posts/' + id + '/reaction', on ? { method: 'DELETE' } : { method: 'PUT', body: { type: k } }).then(function () { full ? postPage(id) : feedPage(); }).catch(fail); };
 A.reportPost = function (id) { ask('سبب البلاغ', false, function (t) { api('/social/posts/' + id + '/report', { method: 'POST', body: { reason: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); }); };
 A.reportComment = function (id) { ask('سبب البلاغ', false, function (t) { api('/social/comments/' + id + '/report', { method: 'POST', body: { reason: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); }); };
-A.delPost = function (id) { if (!confirm('حذف البوست؟')) return; api('/social/posts/' + id, { method: 'DELETE' }).then(function () { toast('تم الحذف'); location.hash = '#/feed'; feedPage(); }).catch(fail); };
+A.delPost = function (id) { yes('حذف البوست؟', function () { api('/social/posts/' + id, { method: 'DELETE' }).then(function () { toast('تم الحذف'); location.hash = '#/feed'; feedPage(); }).catch(fail); });};
 function feedPage() {
   layout('feed', 'التايم لاين', 'أخبار ومشاركات المجتمع');
   Promise.all([api('/social/communities'), api('/social/posts?pageSize=30' + (feedFl.c ? '&communityId=' + feedFl.c : '') + (feedFl.following ? '&following=true' : ''))]).then(function (r) {
@@ -527,7 +528,7 @@ A.applyJob = function (id) {
   var o = modal('<h3>التقديم على الوظيفة</h3><div class="col" style="gap:10px"><label class="fld">رسالة التقديم<textarea id="ap_t" rows="4"></textarea></label><label class="fld">احتياجاتك في بيئة العمل (اختياري، بمزاجك)<textarea id="ap_n" rows="2"></textarea></label><button class="btn" id="ap_go">إرسال</button></div>');
   $('ap_go').onclick = function () { act($('ap_go'), function () { return api('/jobs/' + id + '/apply', { method: 'POST', body: { applicationText: val('ap_t'), voluntarilySharedNeeds: val('ap_n') || null } }); }, 'تم التقديم').then(function () { o.remove(); jobsPage(); }, function () { }); };
 };
-A.closeJob = function (id) { if (!confirm('إغلاق الوظيفة؟')) return; api('/jobs/' + id + '/close', { method: 'POST' }).then(function () { toast('تم'); route(); }).catch(fail); };
+A.closeJob = function (id) { yes('إغلاق الوظيفة؟', function () { api('/jobs/' + id + '/close', { method: 'POST' }).then(function () { toast('تم'); route(); }).catch(fail); });};
 function myAppsPage() {
   layout('myapps', 'تقديماتي', 'حالة طلبات التقديم');
   api('/jobs/applications/mine').then(function (l) {
@@ -637,8 +638,8 @@ function decisionBox(kind, id, needNotes) {
 function bindDecision(kind, id, back) {
   var go = function (approve) {
     if (!approve && kind === 'organization' && !val('dc_notes')) return toast('اكتب سبب الرفض', true);
-    if (!confirm(approve ? 'تأكيد القبول؟' : 'تأكيد الرفض؟')) return;
-    act(approve ? $('dc_ok') : $('dc_no'), function () { return api('/admin/' + kind + '-reviews/' + id + '/decision', { method: 'POST', body: { approve: approve, notes: val('dc_notes') || null } }); }, 'تم تسجيل القرار').then(function () { location.hash = back; });
+    yes(approve ? 'تأكيد القبول؟' : 'تأكيد الرفض؟', function () {
+    act(approve ? $('dc_ok') : $('dc_no'), function () { return api('/admin/' + kind + '-reviews/' + id + '/decision', { method: 'POST', body: { approve: approve, notes: val('dc_notes') || null } }); }, 'تم تسجيل القرار').then(function () { location.hash = back; }); });
   };
   $('dc_ok').onclick = function () { go(true); }; $('dc_no').onclick = function () { go(false); };
 }
@@ -669,7 +670,7 @@ function admSlots() {
     $('sl_add').onclick = function () { var w = $('sl_when').value; if (!w) return toast('اختار الوقت', true); act($('sl_add'), function () { return api('/admin/interview-slots', { method: 'POST', body: { startsAt: new Date(w).toISOString(), durationMinutes: +val('sl_dur') || 30 } }); }, 'تمت الإضافة').then(admSlots); };
   }).catch(errBox);
 }
-A.slotDel = function (id, b) { if (!confirm('حذف الموعد؟')) return; act(b, function () { return api('/admin/interview-slots/' + id, { method: 'DELETE' }); }, 'تم الحذف').then(admSlots); };
+A.slotDel = function (id, b) { yes('حذف الموعد؟', function () { act(b, function () { return api('/admin/interview-slots/' + id, { method: 'DELETE' }); }, 'تم الحذف').then(admSlots); });};
 var uf = { role: '', status: '', q: '' };
 function admUsers() {
   layout('users', 'المستخدمون', 'إيقاف وإعادة تفعيل الحسابات');
@@ -684,7 +685,7 @@ function admUsers() {
   }).catch(errBox);
 }
 A.suspend = function (id, name, on) {
-  if (!on) { if (!confirm('إعادة تفعيل الحساب؟')) return; api('/admin/users/' + id + '/suspension', { method: 'PUT', body: { suspend: false } }).then(function () { toast('تمت إعادة التفعيل'); }).catch(fail); return; }
+  if (!on) { yes('إعادة تفعيل الحساب؟', function () { api('/admin/users/' + id + '/suspension', { method: 'PUT', body: { suspend: false } }).then(function () { toast('تمت إعادة التفعيل'); }).catch(fail); }); return; }
   modal('<h3>إيقاف حساب ' + esc(name) + '؟</h3><div style="color:var(--muted)">هيتسجّل خروجه ومش هيقدر يدخل لحد ما تعيد تفعيله. السبب بيظهر في سجل العمليات.</div><label class="fld">السبب (مطلوب)<textarea id="su_r"></textarea></label><div style="display:flex;gap:10px"><button class="btn o" id="su_ok" style="flex:1">تأكيد الإيقاف</button><button class="btn g" onclick="A.closeModal()" style="flex:1">إلغاء</button></div>');
   $('su_ok').onclick = function () { if (!val('su_r')) return toast('اكتب السبب', true); act(this, function () { return api('/admin/users/' + id + '/suspension', { method: 'PUT', body: { suspend: true, reason: val('su_r') } }); }, 'تم الإيقاف').then(A.closeModal); };
 };
@@ -696,7 +697,7 @@ function admDeletions() {
     document.querySelectorAll('.tabs span').forEach(function (e) { e.onclick = function () { fl.dl = e.getAttribute('data-s'); admDeletions(); }; });
   }).catch(errBox);
 }
-A.resolve = function (id, ok) { if (!confirm(ok ? 'موافقة نهائية على الحذف؟ ما فيش رجوع.' : 'رفض الطلب؟')) return; api('/admin/deletion-requests/' + id + '/resolve', { method: 'POST', body: { approve: ok } }).then(function () { toast('تم'); admDeletions(); }).catch(fail); };
+A.resolve = function (id, ok) { yes(ok ? 'موافقة نهائية على الحذف؟ ما فيش رجوع.' : 'رفض الطلب؟', function () { api('/admin/deletion-requests/' + id + '/resolve', { method: 'POST', body: { approve: ok } }).then(function () { toast('تم'); admDeletions(); }).catch(fail); }); };
 var leadTab = 'interests';
 function admLeads() {
   layout('leads', 'طلبات صفحة اللاندنج', 'من نماذج الموقع العام');
@@ -748,7 +749,7 @@ function myProductsPage() {
     A.editProd = function (i) { form(window.__prods[i], myProductsPage); };
   }).catch(function (e) { body('<div class="note e">' + esc(e.message) + '</div>'); });
 }
-A.delProd = function (id) { if (!confirm('حذف المنتج؟')) return; api('/shops/products/' + id, { method: 'DELETE' }).then(function () { toast('تم الحذف'); myProductsPage(); }).catch(fail); };
+A.delProd = function (id) { yes('حذف المنتج؟', function () { api('/shops/products/' + id, { method: 'DELETE' }).then(function () { toast('تم الحذف'); myProductsPage(); }).catch(fail); });};
 
 /* ---------- router ---------- */
 var PAGES = {
