@@ -153,12 +153,12 @@ function forgotPage() {
 
 /* ---------- layout ---------- */
 var NAV = {
-  volunteer: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['verification', 'حالة التحقق'], ['interview', 'المقابلة'], ['availability', 'مواعيد التطوع'], ['training', 'التدريب'], ['open', 'طلبات مفتوحة'], ['mine', 'عروضي ومحادثاتي'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  disabled_user: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['myapps', 'تقديماتي'], ['needs', 'احتياجاتي وإعدادات الوصول'], ['requests', 'طلبات المساعدة'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  association: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['myjobs', 'وظائفي'], ['org', 'بيانات الجمعية'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  company: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['myjobs', 'وظائفي'], ['org', 'بيانات الشركة'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  shop: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['shops', 'المحلات'], ['myproducts', 'منتجاتي'], ['org', 'بيانات المحل'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  admin: [['home', 'نظرة عامة'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['feed', 'التايم لاين'], ['moderation', 'المجتمعات والبلاغات'], ['vreviews', 'مراجعة المتطوعين'], ['oreviews', 'مراجعة الجهات'], ['slots', 'مواعيد المقابلات'], ['users', 'المستخدمون'], ['deletions', 'طلبات حذف الحساب'], ['leads', 'طلبات الموقع'], ['audit', 'سجل العمليات'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']]
+  volunteer: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['services', 'الخدمات والفعاليات'], ['places', 'خريطة الأماكن'], ['sos', 'زر الطوارئ'], ['inquiries', 'استفساراتي'], ['verification', 'حالة التحقق'], ['interview', 'المقابلة'], ['availability', 'مواعيد التطوع'], ['training', 'التدريب'], ['open', 'طلبات مفتوحة'], ['mine', 'عروضي ومحادثاتي'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  disabled_user: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['services', 'الخدمات والفعاليات'], ['places', 'خريطة الأماكن'], ['sos', 'زر الطوارئ'], ['inquiries', 'استفساراتي'], ['myapps', 'تقديماتي'], ['needs', 'احتياجاتي وإعدادات الوصول'], ['requests', 'طلبات المساعدة'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  association: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['services', 'الخدمات والفعاليات'], ['places', 'خريطة الأماكن'], ['myservices', 'خدماتي'], ['inquiries', 'الاستفسارات'], ['myjobs', 'وظائفي'], ['org', 'بيانات الجمعية'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  company: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['services', 'الخدمات والفعاليات'], ['places', 'خريطة الأماكن'], ['inquiries', 'استفساراتي'], ['myjobs', 'وظائفي'], ['org', 'بيانات الشركة'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  shop: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['shops', 'المحلات'], ['services', 'الخدمات والفعاليات'], ['places', 'خريطة الأماكن'], ['myproducts', 'منتجاتي'], ['org', 'بيانات المحل'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  admin: [['home', 'نظرة عامة'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['services', 'الخدمات والفعاليات'], ['places', 'خريطة الأماكن'], ['stats', 'الإحصائيات'], ['feed', 'التايم لاين'], ['moderation', 'المجتمعات والبلاغات'], ['vreviews', 'مراجعة المتطوعين'], ['oreviews', 'مراجعة الجهات'], ['slots', 'مواعيد المقابلات'], ['users', 'المستخدمون'], ['deletions', 'طلبات حذف الحساب'], ['leads', 'طلبات الموقع'], ['audit', 'سجل العمليات'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']]
 };
 var unread = 0;
 function layout(page, title, sub, actionsHtml) {
@@ -751,14 +751,117 @@ function myProductsPage() {
 }
 A.delProd = function (id) { yes('حذف المنتج؟', function () { api('/shops/products/' + id, { method: 'DELETE' }).then(function () { toast('تم الحذف'); myProductsPage(); }).catch(fail); });};
 
+/* ---------- phase 6: services, places, SOS, stats ---------- */
+var P6T = { service: 'خدمة', program: 'برنامج', event: 'فعالية' };
+var svf = { q: '', type: '' };
+function servicesPage() {
+  layout('services', 'الخدمات والفعاليات', 'خدمات وبرامج وفعاليات الجمعيات المعتمدة');
+  api('/directory/items?pageSize=50' + (svf.type ? '&type=' + svf.type : '') + (svf.q ? '&q=' + encodeURIComponent(svf.q) : ''), { anon: true }).then(function (r) {
+    var l = items(r), canAsk = auth.role !== 'admin' && auth.role !== 'shop';
+    body('<div class="card" style="display:flex;gap:10px;flex-wrap:wrap"><input id="svq" placeholder="ابحث" value="' + esc(svf.q) + '" style="flex:1;min-width:160px"><select id="svt"><option value="">الكل</option>' + Object.keys(P6T).map(function (k) { return '<option value="' + k + '"' + (svf.type === k ? ' selected' : '') + '>' + P6T[k] + '</option>'; }).join('') + '</select><button class="btn" id="svgo">بحث</button></div>' +
+      (l.length ? '<div class="row" style="align-items:stretch">' + l.map(function (x) { return '<div class="card col" style="flex:1;min-width:260px"><div>' + tag('tb', P6T[x.itemType] || x.itemType) + '</div><b style="font-size:18px">' + esc(x.title) + '</b><div style="color:var(--muted);font-size:14px">' + esc(x.organizationName) + '</div><div style="font-size:14px">' + esc(x.description) + '</div>' + (x.startsAt ? '<div style="font-size:13px;color:var(--muted)">📅 ' + dt(x.startsAt) + '</div>' : '') + (canAsk ? '<button class="btn s" onclick="A.inq(\'' + x.itemId + '\')">استفسار</button>' : '') + '</div>'; }).join('') + '</div>' : empty('مفيش خدمات منشورة لسه.')));
+    $('svgo').onclick = function () { svf.q = val('svq'); svf.type = $('svt').value; servicesPage(); };
+  }).catch(errBox);
+}
+A.inq = function (id) {
+  var o = modal('<h3>استفسار للجمعية</h3><div class="col" style="gap:8px"><label class="fld">الموضوع<input id="iq_s"></label><label class="fld">رسالتك<textarea id="iq_b" rows="3"></textarea></label><button class="btn" id="iq_go">إرسال</button></div>');
+  $('iq_go').onclick = function () { if (!val('iq_s') || !val('iq_b')) return toast('اكتب الموضوع والرسالة', true); act($('iq_go'), function () { return api('/directory/items/' + id + '/inquiries', { method: 'POST', body: { subject: val('iq_s'), body: val('iq_b') } }); }, 'وصلت رسالتك للجمعية').then(function () { o.remove(); }, function () { }); };
+};
+function myServicesPage() {
+  layout('myservices', 'خدماتي وفعالياتي', 'اللي بتنشره بيظهر للناس بعد اعتماد الجمعية', '<button class="btn" id="ns">+ جديد</button>');
+  $('ns').onclick = function () {
+    var o = modal('<h3>إضافة جديد</h3><div class="col" style="gap:8px"><label class="fld">النوع<select id="ms_t"><option value="service">خدمة</option><option value="program">برنامج</option><option value="event">فعالية</option></select></label><label class="fld">العنوان<input id="ms_n"></label><label class="fld">الوصف<textarea id="ms_d" rows="3"></textarea></label><label class="fld">يبدأ (اختياري)<input id="ms_s" type="datetime-local"></label><label class="fld">ينتهي (اختياري)<input id="ms_e" type="datetime-local"></label><label><input type="checkbox" id="ms_p" checked> انشر دلوقتي</label><button class="btn" id="ms_go">حفظ</button></div>');
+    $('ms_go').onclick = function () { if (!val('ms_n') || !val('ms_d')) return toast('اكتب العنوان والوصف', true); act($('ms_go'), function () { return api('/directory/items', { method: 'POST', body: { itemType: $('ms_t').value, title: val('ms_n'), description: val('ms_d'), startsAt: val('ms_s') ? new Date(val('ms_s')).toISOString() : null, endsAt: val('ms_e') ? new Date(val('ms_e')).toISOString() : null, publish: $('ms_p').checked } }); }, 'تم الحفظ').then(function () { o.remove(); myServicesPage(); }, function () { }); };
+  };
+  api('/directory/items/mine').then(function (l) {
+    var st = { draft: ['tw', 'مسودة'], published: ['tg', 'منشور'], archived: ['tn', 'مؤرشف'] };
+    body(l.length ? l.map(function (x) { var s = st[x.publicationStatus] || ['tn', x.publicationStatus]; return '<div class="card" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="flex:1"><b>' + esc(x.title) + '</b><div style="font-size:13px;color:var(--muted)">' + (P6T[x.itemType] || '') + ' · ' + x.inquiriesCount + ' استفسار</div></div>' + tag(s[0], s[1]) + (x.publicationStatus !== 'published' ? '<button class="btn s" onclick="A.svSt(\'' + x.itemId + '\',\'published\')">نشر</button>' : '') + (x.publicationStatus !== 'archived' ? '<button class="btn s g" onclick="A.svSt(\'' + x.itemId + '\',\'archived\')">أرشفة</button>' : '') + '</div>'; }).join('') : empty('لسه ما أضفتش حاجة.'));
+  }).catch(errBox);
+}
+A.svSt = function (id, s) { api('/directory/items/' + id + '/status', { method: 'PUT', body: { status: s } }).then(function () { toast('تم'); myServicesPage(); }).catch(fail); };
+var inqTab = 'sent';
+function inquiriesPage() {
+  var isA = auth.role === 'association';
+  layout('inquiries', 'الاستفسارات', isA ? 'استفسارات الناس على خدماتك' : 'استفساراتك للجمعيات');
+  var recv = isA && inqTab === 'received';
+  api('/directory/inquiries?received=' + recv).then(function (l) {
+    body((isA ? '<div class="card" style="display:flex;gap:10px"><button class="btn s' + (recv ? ' g' : '') + '" onclick="A.itab(\'sent\')">اللي بعتها</button><button class="btn s' + (recv ? '' : ' g') + '" onclick="A.itab(\'received\')">الواردة</button></div>' : '') +
+      (l.length ? l.map(function (x) { return '<div class="card" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="flex:1"><b>' + esc(x.subject) + '</b><div style="font-size:13px;color:var(--muted)">' + esc(x.itemTitle) + ' · ' + esc(recv ? x.senderName : x.organizationName) + ' · ' + dt(x.createdAt) + '</div></div><button class="btn s" onclick="A.thread(\'' + x.inquiryId + '\')">فتح المحادثة</button></div>'; }).join('') : empty('مفيش استفسارات.')));
+  }).catch(errBox);
+}
+A.itab = function (t) { inqTab = t; inquiriesPage(); };
+A.thread = function (id) {
+  api('/directory/inquiries/' + id).then(function (x) {
+    var o = modal('<h3>' + esc(x.subject) + '</h3><div class="col" style="gap:8px;max-height:50vh;overflow:auto">' + x.messages.map(function (m) { return '<div class="card"><b style="font-size:13px">' + esc(m.senderName) + '</b><div>' + esc(m.body) + '</div><div style="font-size:12px;color:var(--muted)">' + dt(m.sentAt) + '</div></div>'; }).join('') + '</div><textarea id="th_b" rows="2" placeholder="اكتب ردك"></textarea><button class="btn" id="th_go">إرسال</button>');
+    $('th_go').onclick = function () { if (!val('th_b')) return toast('اكتب الرد', true); act($('th_go'), function () { return api('/directory/inquiries/' + id + '/messages', { method: 'POST', body: { body: val('th_b') } }); }, 'تم الإرسال').then(function () { o.remove(); A.thread(id); }, function () { }); };
+  }).catch(fail);
+};
+var plf = { q: '', facility: '' };
+function placesPage() {
+  var isAdm = auth.role === 'admin';
+  layout('places', 'خريطة الأماكن المتاحة', 'أماكن متاحة لذوي الإعاقة، مع التسهيلات والتقييمات', isAdm ? '<button class="btn" id="np6">+ مكان جديد</button>' : '');
+  Promise.all([api('/places/facility-types', { anon: true }), api('/places?pageSize=50' + (plf.facility ? '&facility=' + encodeURIComponent(plf.facility) : '') + (plf.q ? '&q=' + encodeURIComponent(plf.q) : ''), { anon: true }), api('/places/obstacles', { anon: true })]).then(function (rs) {
+    var types = rs[0], l = items(rs[1]), obs = rs[2];
+    window.__places = l;
+    body('<div class="card" style="display:flex;gap:10px;flex-wrap:wrap"><input id="plq" placeholder="ابحث باسم المكان أو العنوان" value="' + esc(plf.q) + '" style="flex:1;min-width:160px"><select id="plf"><option value="">كل التسهيلات</option>' + types.map(function (t) { return '<option' + (plf.facility === t ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') + '</select><button class="btn" id="plgo">بحث</button></div>' +
+      (l.length ? '<div class="row" style="align-items:stretch">' + l.map(function (p, i) { return '<div class="card col" style="flex:1;min-width:260px"><b style="font-size:18px">' + esc(p.name) + '</b><div style="color:var(--muted);font-size:14px">' + esc(p.address) + '</div><div style="display:flex;gap:6px;flex-wrap:wrap">' + p.facilities.filter(function (f) { return f.status === 'available'; }).map(function (f) { return tag('tg', f.type); }).join('') + '</div><div style="font-size:14px">' + (p.averageRating ? '⭐ ' + p.averageRating.toFixed(1) + ' (' + p.reviewsCount + ')' : 'لسه ما فيش تقييمات') + '</div><button class="btn s" onclick="A.place(' + i + ')">التفاصيل والخريطة</button></div>'; }).join('') + '</div>' : empty('مفيش أماكن مطابقة.')) +
+      (obs.length ? '<div class="card col"><b>عوائق مُبلّغ عنها (' + obs.length + ')</b>' + obs.slice(0, 10).map(function (o) { return '<div style="font-size:14px">⚠️ ' + esc(o.description) + ' ' + tag(o.status === 'verified' ? 'tr' : 'tw', o.status === 'verified' ? 'مؤكد' : 'جديد') + ' <a target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat=' + o.latitude + '&mlon=' + o.longitude + '#map=18/' + o.latitude + '/' + o.longitude + '">الموقع</a></div>'; }).join('') + '</div>' : ''));
+    $('plgo').onclick = function () { plf.q = val('plq'); plf.facility = $('plf').value; placesPage(); };
+    if (isAdm) $('np6').onclick = function () { newPlace(types); };
+  }).catch(errBox);
+}
+function newPlace(types) {
+  var o = modal('<h3>مكان جديد</h3><div class="col" style="gap:8px"><label class="fld">الاسم<input id="np_n"></label><label class="fld">العنوان<input id="np_a"></label><div style="display:flex;gap:8px"><label class="fld" style="flex:1">خط العرض<input id="np_la" type="number" step="any" value="30.0444"></label><label class="fld" style="flex:1">خط الطول<input id="np_lo" type="number" step="any" value="31.2357"></label></div><label class="fld">مصدر التحقق<input id="np_v" value="زيارة ميدانية"></label><div>التسهيلات المتاحة:</div><div style="display:flex;gap:10px;flex-wrap:wrap">' + types.map(function (t, i) { return '<label><input type="checkbox" class="np_f" value="' + esc(t) + '"> ' + esc(t) + '</label>'; }).join('') + '</div><button class="btn" id="np_go">حفظ</button></div>');
+  $('np_go').onclick = function () { if (!val('np_n') || !val('np_a')) return toast('اكتب الاسم والعنوان', true); var f = [].slice.call(document.querySelectorAll('.np_f')).filter(function (c) { return c.checked; }).map(function (c) { return { type: c.value, status: 'available', notes: null }; }); act($('np_go'), function () { return api('/places', { method: 'POST', body: { name: val('np_n'), address: val('np_a'), latitude: Number(val('np_la')), longitude: Number(val('np_lo')), verificationSource: val('np_v') || 'admin', facilities: f } }); }, 'تمت الإضافة').then(function () { o.remove(); placesPage(); }, function () { }); };
+}
+A.place = function (i) {
+  var p = window.__places[i], d = 0.004, bb = [p.longitude - d, p.latitude - d, p.longitude + d, p.latitude + d].join('%2C'), canRate = auth.role !== 'admin';
+  var o = modal('<h3>' + esc(p.name) + '</h3><div style="color:var(--muted)">' + esc(p.address) + (p.lastVerifiedAt ? ' · آخر تحقق ' + dt(p.lastVerifiedAt) : '') + '</div><iframe title="خريطة" style="width:100%;height:240px;border:0;border-radius:12px" src="https://www.openstreetmap.org/export/embed.html?bbox=' + bb + '&layer=mapnik&marker=' + p.latitude + '%2C' + p.longitude + '"></iframe><div style="display:flex;gap:6px;flex-wrap:wrap">' + p.facilities.map(function (f) { return tag(f.status === 'available' ? 'tg' : f.status === 'unavailable' ? 'tr' : 'tn', f.type + (f.status === 'available' ? ' ✓' : f.status === 'unavailable' ? ' ✗' : ' ؟')); }).join('') + '</div>' +
+    (canRate ? '<div class="col" style="gap:8px"><select id="rv_r"><option value="5">⭐⭐⭐⭐⭐</option><option value="4">⭐⭐⭐⭐</option><option value="3">⭐⭐⭐</option><option value="2">⭐⭐</option><option value="1">⭐</option></select><input id="rv_c" placeholder="تعليقك (اختياري)"><div style="display:flex;gap:8px"><button class="btn s" id="rv_go">قيّم المكان</button><button class="btn s o" id="ob_go">بلّغ عن عائق</button></div></div>' : ''));
+  if (canRate) {
+    $('rv_go').onclick = function () { act($('rv_go'), function () { return api('/places/' + p.placeId + '/review', { method: 'PUT', body: { rating: Number($('rv_r').value), comment: val('rv_c') || null } }); }, 'شكراً على تقييمك').then(function () { o.remove(); placesPage(); }, function () { }); };
+    $('ob_go').onclick = function () { o.remove(); ask('وصف العائق', false, function (t) { api('/places/obstacles', { method: 'POST', body: { placeId: p.placeId, description: t, latitude: p.latitude, longitude: p.longitude } }).then(function () { toast('وصل بلاغك'); placesPage(); }).catch(fail); }); };
+  }
+};
+function sosPage() {
+  layout('sos', 'زر الطوارئ', 'بيبعت موقعك لجهات الطوارئ اللي أنت حددتها');
+  api('/sos/contacts').then(function (c) {
+    body('<div class="card col" style="align-items:center;text-align:center"><button class="btn" id="sos_go" style="background:#d62d20;font-size:26px;padding:26px 48px;border-radius:999px">SOS</button><div style="color:var(--muted);font-size:14px">اضغط في الحالات الطارئة بس. هيتبعت موقعك الحالي لجهات الطوارئ.</div></div>' +
+      '<div class="card col"><b>جهات الطوارئ (' + c.length + ')</b>' + (c.length ? c.map(function (x) { return '<div style="display:flex;gap:10px;align-items:center"><span style="flex:1">' + esc(x.displayName) + ' · ' + esc(x.maskedDestination) + '</span><button class="btn s g" onclick="A.delCt(\'' + x.contactId + '\')">حذف</button></div>'; }).join('') : '<div style="color:var(--muted)">ضيف جهة طوارئ واحدة على الأقل عشان الزر يشتغل.</div>') + '<button class="btn s" id="ct_add">+ إضافة جهة</button></div><div id="sos_hist"></div>');
+    $('ct_add').onclick = function () {
+      var o = modal('<h3>جهة طوارئ</h3><div class="col" style="gap:8px"><label class="fld">الاسم<input id="ct_n"></label><label class="fld">رقم الموبايل أو الإيميل<input id="ct_d"></label><button class="btn" id="ct_go">حفظ</button></div>');
+      $('ct_go').onclick = function () { act($('ct_go'), function () { return api('/sos/contacts', { method: 'POST', body: { displayName: val('ct_n'), destination: val('ct_d') } }); }, 'تمت الإضافة').then(function () { o.remove(); sosPage(); }, function () { }); };
+    };
+    $('sos_go').onclick = function () {
+      yes('تبعت تنبيه طوارئ بموقعك دلوقتي؟', function () {
+        if (!navigator.geolocation) return toast('المتصفح مش بيدعم تحديد الموقع', true);
+        navigator.geolocation.getCurrentPosition(function (pos) {
+          api('/sos/alerts', { method: 'POST', body: { latitude: pos.coords.latitude, longitude: pos.coords.longitude, message: null } }).then(function (a) { toast('اتبعت التنبيه لـ ' + a.deliveries.length + ' جهة'); sosPage(); }).catch(fail);
+        }, function () { toast('فعّل خدمة الموقع وجرّب تاني', true); });
+      });
+    };
+    api('/sos/alerts/mine').then(function (h) { if (h.length) $('sos_hist').innerHTML = '<div class="card col"><b>آخر التنبيهات</b>' + h.slice(0, 5).map(function (a) { return '<div style="font-size:14px">' + dt(a.createdAt) + ' · ' + a.deliveries.length + ' جهة</div>'; }).join('') + '</div>'; }).catch(function () { });
+  }).catch(errBox);
+}
+A.delCt = function (id) { yes('حذف جهة الطوارئ؟', function () { api('/sos/contacts/' + id, { method: 'DELETE' }).then(function () { toast('تم الحذف'); sosPage(); }).catch(fail); }); };
+function statsPage() {
+  layout('stats', 'الإحصائيات', 'أرقام المنصة');
+  Promise.all([api('/stats/admin'), api('/places/obstacles/all')]).then(function (rs) {
+    var s = rs[0], t = s.totals, obs = rs[1];
+    body('<div class="row">' + kpi(t.verifiedVolunteers, 'متطوعين موثّقين') + kpi(t.disabledUsers, 'مستخدمين') + kpi(t.approvedOrganizations, 'جهات معتمدة') + kpi(t.publishedJobs, 'وظائف منشورة') + kpi(t.completedHelpRequests, 'طلبات مساعدة اتنفذت') + kpi(t.places, 'أماكن متاحة') + '</div><div class="row">' + kpi(s.pendingVolunteerReviews, 'متطوعين مستنيين مراجعة') + kpi(s.pendingOrganizationReviews, 'جهات مستنية مراجعة') + kpi(s.openContentReports + s.openSafetyReports, 'بلاغات مفتوحة') + kpi(s.sosAlertsLast30Days, 'تنبيهات SOS (30 يوم)') + kpi(s.newUsersLast7Days, 'مستخدمين جدد (7 أيام)') + '</div>' +
+      '<div class="card col"><b>بلاغات العوائق (' + obs.length + ')</b>' + (obs.length ? obs.slice(0, 30).map(function (o) { return '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="flex:1;font-size:14px">' + esc(o.description) + ' ' + tag(o.status === 'open' ? 'tw' : o.status === 'verified' ? 'tr' : 'tn', o.status) + '</span>' + ['verified', 'resolved', 'rejected'].filter(function (x) { return x !== o.status; }).map(function (x) { return '<button class="btn s g" onclick="A.obSt(\'' + o.obstacleId + '\',\'' + x + '\')">' + ({ verified: 'تأكيد', resolved: 'تم الحل', rejected: 'رفض' })[x] + '</button>'; }).join('') + '</div>'; }).join('') : '<div style="color:var(--muted)">مفيش بلاغات.</div>') + '</div>');
+  }).catch(errBox);
+}
+A.obSt = function (id, s) { api('/places/obstacles/' + id + '/status', { method: 'PUT', body: { status: s } }).then(function () { toast('تم'); statsPage(); }).catch(fail); };
+
 /* ---------- router ---------- */
 var PAGES = {
-  volunteer: { jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: volHome, verification: volVerification, interview: volInterview, availability: volAvailability, training: volTraining, open: volOpen, mine: volMine, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
-  disabled_user: { myapps: myAppsPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: duHome, needs: duNeeds, requests: duRequests, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
-  association: { myjobs: myJobsPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
-  company: { myjobs: myJobsPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
-  shop: { shops: shopsPage, myproducts: myProductsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
-  admin: { jobs: jobsPage, shops: shopsPage, feed: feedPage, moderation: admModeration, home: admHome, vreviews: function () { admList('volunteer', 'vreviews', 'مراجعة المتطوعين'); }, oreviews: function () { admList('organization', 'oreviews', 'مراجعة الجمعيات والشركات والمحلات'); }, slots: admSlots, users: admUsers, deletions: admDeletions, leads: admLeads, audit: admAudit, notifications: notificationsPage, settings: settingsPage }
+  volunteer: { services: servicesPage, places: placesPage, sos: sosPage, inquiries: inquiriesPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: volHome, verification: volVerification, interview: volInterview, availability: volAvailability, training: volTraining, open: volOpen, mine: volMine, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
+  disabled_user: { services: servicesPage, places: placesPage, sos: sosPage, inquiries: inquiriesPage, myapps: myAppsPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: duHome, needs: duNeeds, requests: duRequests, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
+  association: { services: servicesPage, places: placesPage, myservices: myServicesPage, inquiries: inquiriesPage, myjobs: myJobsPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
+  company: { services: servicesPage, places: placesPage, inquiries: inquiriesPage, myjobs: myJobsPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
+  shop: { services: servicesPage, places: placesPage, shops: shopsPage, myproducts: myProductsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
+  admin: { services: servicesPage, places: placesPage, stats: statsPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, moderation: admModeration, home: admHome, vreviews: function () { admList('volunteer', 'vreviews', 'مراجعة المتطوعين'); }, oreviews: function () { admList('organization', 'oreviews', 'مراجعة الجمعيات والشركات والمحلات'); }, slots: admSlots, users: admUsers, deletions: admDeletions, leads: admLeads, audit: admAudit, notifications: notificationsPage, settings: settingsPage }
 };
 function route() {
   var h = (location.hash || '').replace(/^#\/?/, '');
