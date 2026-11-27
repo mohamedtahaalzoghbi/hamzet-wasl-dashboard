@@ -19,7 +19,7 @@ function d(s) { if (!s) return '—'; try { return new Date(s).toLocaleDateStrin
 function tag(c, t) { return '<span class="tag ' + c + '">' + esc(t) + '</span>'; }
 function toast(m, err) { var t = document.createElement('div'); t.className = 'toast' + (err ? ' e' : ''); t.textContent = m; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3500); }
 function busy(btn, on) { if (btn) { btn.disabled = !!on; } }
-var ROLE_AR = { volunteer: 'متطوع', disabled_user: 'صاحب همة', association: 'جمعية', company: 'شركة', admin: 'مدير النظام' };
+var ROLE_AR = { volunteer: 'متطوع', disabled_user: 'صاحب همة', association: 'جمعية', company: 'شركة', shop: 'محل', admin: 'مدير النظام' };
 var STATUS = {
   unverified: ['tn', 'لم يبدأ التحقق'], pending: ['tw', 'قيد المراجعة'], interview_scheduled: ['tb', 'مقابلة محجوزة'],
   approved: ['tg', 'معتمد'], rejected: ['tr', 'مرفوض'], active: ['tg', 'نشط'], suspended: ['tr', 'موقوف'], pending_approval: ['tw', 'بانتظار الاعتماد'],
@@ -116,13 +116,13 @@ function registerPage() {
   reg.role = reg.role || 'volunteer';
   var rolesEl = $('rg_roles');
   function paint() {
-    rolesEl.innerHTML = ['volunteer', 'disabled_user', 'association', 'company'].map(function (r) { return '<span class="chip ' + (reg.role === r ? 'on' : '') + '" data-r="' + r + '">' + ROLE_AR[r] + '</span>'; }).join('');
-    $('rg_namelbl').textContent = (reg.role === 'association' || reg.role === 'company') ? 'اسم الجهة' : 'الاسم';
+    rolesEl.innerHTML = ['volunteer', 'disabled_user', 'association', 'company', 'shop'].map(function (r) { return '<span class="chip ' + (reg.role === r ? 'on' : '') + '" data-r="' + r + '">' + ROLE_AR[r] + '</span>'; }).join('');
+    $('rg_namelbl').textContent = (reg.role === 'association' || reg.role === 'company' || reg.role === 'shop') ? 'اسم الجهة' : 'الاسم';
   }
   rolesEl.onclick = function (e) { var r = e.target.getAttribute && e.target.getAttribute('data-r'); if (r) { reg.role = r; paint(); } };
   paint();
   $('rg_go').onclick = function () {
-    var org = reg.role === 'association' || reg.role === 'company';
+    var org = reg.role === 'association' || reg.role === 'company' || reg.role === 'shop';
     var body = { role: reg.role, email: val('rg_email'), phone: val('rg_phone'), password: $('rg_pw').value, confirmPassword: $('rg_pw2').value, termsAccepted: $('rg_terms').checked, policyVersion: '1.0' };
     if (org) body.organizationName = val('rg_name'); else body.name = val('rg_name');
     var b = $('rg_go'); busy(b, true);
@@ -153,11 +153,12 @@ function forgotPage() {
 
 /* ---------- layout ---------- */
 var NAV = {
-  volunteer: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['verification', 'حالة التحقق'], ['interview', 'المقابلة'], ['availability', 'مواعيد التطوع'], ['training', 'التدريب'], ['open', 'طلبات مفتوحة'], ['mine', 'عروضي ومحادثاتي'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  disabled_user: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['myapps', 'تقديماتي'], ['needs', 'احتياجاتي وإعدادات الوصول'], ['requests', 'طلبات المساعدة'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  association: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['myjobs', 'وظائفي'], ['org', 'بيانات الجمعية'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  company: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['myjobs', 'وظائفي'], ['org', 'بيانات الشركة'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
-  admin: [['home', 'نظرة عامة'], ['jobs', 'الوظائف'], ['feed', 'التايم لاين'], ['moderation', 'المجتمعات والبلاغات'], ['vreviews', 'مراجعة المتطوعين'], ['oreviews', 'مراجعة الجهات'], ['slots', 'مواعيد المقابلات'], ['users', 'المستخدمون'], ['deletions', 'طلبات حذف الحساب'], ['leads', 'طلبات الموقع'], ['audit', 'سجل العمليات'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']]
+  volunteer: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['verification', 'حالة التحقق'], ['interview', 'المقابلة'], ['availability', 'مواعيد التطوع'], ['training', 'التدريب'], ['open', 'طلبات مفتوحة'], ['mine', 'عروضي ومحادثاتي'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  disabled_user: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['myapps', 'تقديماتي'], ['needs', 'احتياجاتي وإعدادات الوصول'], ['requests', 'طلبات المساعدة'], ['profile', 'ملفي الشخصي'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  association: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['myjobs', 'وظائفي'], ['org', 'بيانات الجمعية'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  company: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['myjobs', 'وظائفي'], ['org', 'بيانات الشركة'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  shop: [['home', 'الرئيسية'], ['feed', 'التايم لاين'], ['communities', 'المجتمعات'], ['shops', 'المحلات'], ['myproducts', 'منتجاتي'], ['org', 'بيانات المحل'], ['media', 'اللوجو والغلاف'], ['docs', 'المستندات'], ['status', 'حالة الاعتماد'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']],
+  admin: [['home', 'نظرة عامة'], ['jobs', 'الوظائف'], ['shops', 'المحلات'], ['feed', 'التايم لاين'], ['moderation', 'المجتمعات والبلاغات'], ['vreviews', 'مراجعة المتطوعين'], ['oreviews', 'مراجعة الجهات'], ['slots', 'مواعيد المقابلات'], ['users', 'المستخدمون'], ['deletions', 'طلبات حذف الحساب'], ['leads', 'طلبات الموقع'], ['audit', 'سجل العمليات'], ['notifications', 'الإشعارات'], ['settings', 'الإعدادات']]
 };
 var unread = 0;
 function layout(page, title, sub, actionsHtml) {
@@ -169,6 +170,10 @@ function layout(page, title, sub, actionsHtml) {
 }
 function body(html) { var b = $('body'); if (b) b.innerHTML = html; }
 function errBox(e) { body('<div class="note e">' + esc(e.message || 'حصلت مشكلة') + ' <button class="btn s" onclick="location.reload()">إعادة المحاولة</button></div>'); }
+function ask(title, optional, cb) {
+  var o = modal('<h3>' + esc(title) + '</h3><div class="col" style="gap:10px"><textarea id="ask_t" rows="3"></textarea><button class="btn" id="ask_go">تأكيد</button></div>');
+  $('ask_go').onclick = function () { var t = val('ask_t'); if (!t && !optional) { toast('اكتب المطلوب الأول'); return; } o.remove(); cb(t); };
+}
 function kpi(n, l, dd) { return '<div class="card kpi"><div class="n">' + esc(n) + '</div><div class="l">' + esc(l) + '</div><div class="d">' + esc(dd || '') + '</div></div>'; }
 function empty(m) { return '<div class="empty">' + esc(m) + '</div>'; }
 function table(heads, rows) { if (!rows.length) return ''; return '<div class="scroll"><table><tr>' + heads.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr>' + rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</table></div>'; }
@@ -433,7 +438,7 @@ function requestPage(id) {
     if ($('of_go')) $('of_go').onclick = function () { act($('of_go'), function () { return api('/help/requests/' + id + '/offers', { method: 'POST', body: { message: val('of_msg') || null } }); }, 'تم إرسال العرض').then(function () { requestPage(id); }, function () { }); };
     if ($('hr_done')) $('hr_done').onclick = function () { act($('hr_done'), function () { return api('/help/requests/' + id + '/complete', { method: 'POST' }); }, 'تم').then(function () { requestPage(id); }, function () { }); };
     if ($('fb_go')) $('fb_go').onclick = function () { act($('fb_go'), function () { return api('/help/requests/' + id + '/feedback', { method: 'POST', body: { rating: +val('fb_r'), comment: val('fb_c') || null } }); }, 'شكرًا على تقييمك').then(function () { $('fb_go').disabled = true; }, function () { }); };
-    if ($('sr_go')) $('sr_go').onclick = function () { var t = prompt('اوصف المشكلة:'); if (!t) return; api('/help/requests/' + id + '/safety-report', { method: 'POST', body: { description: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); };
+    if ($('sr_go')) $('sr_go').onclick = function () { ask('اوصف المشكلة', false, function (t) { api('/help/requests/' + id + '/safety-report', { method: 'POST', body: { description: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); }); };
     if (d.chatOpen) {
       var load = function () { api('/help/requests/' + id + '/messages').then(function (m) { var el = $('ch_list'); if (!el) return; el.innerHTML = items(m).map(function (x) { var me = x.senderId === auth.userId; return '<div style="align-self:' + (me ? 'flex-start' : 'flex-end') + ';background:' + (me ? '#E7F2ED' : '#FBF8F5') + ';border-radius:12px;padding:8px 12px;max-width:80%"><small style="color:var(--muted)">' + esc(x.senderName) + '</small><br>' + esc(x.text) + '</div>'; }).join('') || empty('ابدأ المحادثة.'); el.scrollTop = el.scrollHeight; }).catch(function () { }); };
       load();
@@ -451,8 +456,8 @@ function postCard(p, full) {
     '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' + Object.keys(RX).map(function (k) { return '<button class="btn s ' + (p.myReaction === k ? '' : 'g') + '" onclick="A.react(\'' + p.postId + '\',\'' + k + '\',' + (p.myReaction === k) + ',' + (full ? 1 : 0) + ')">' + RX[k] + '</button>'; }).join('') + '<small style="color:var(--muted)">' + p.reactionsCount + ' تفاعل</small>' + (full ? '' : '<a class="btn s g" href="#/post/' + p.postId + '">💬 ' + p.commentsCount + ' تعليق</a>') + '<button class="btn s g" onclick="A.reportPost(\'' + p.postId + '\')">إبلاغ</button>' + (p.authorId === auth.userId ? '<button class="btn s g" onclick="A.delPost(\'' + p.postId + '\')">حذف</button>' : '') + '</div></div>';
 }
 A.react = function (id, k, on, full) { api('/social/posts/' + id + '/reaction', on ? { method: 'DELETE' } : { method: 'PUT', body: { type: k } }).then(function () { full ? postPage(id) : feedPage(); }).catch(fail); };
-A.reportPost = function (id) { var t = prompt('سبب البلاغ:'); if (!t) return; api('/social/posts/' + id + '/report', { method: 'POST', body: { reason: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); };
-A.reportComment = function (id) { var t = prompt('سبب البلاغ:'); if (!t) return; api('/social/comments/' + id + '/report', { method: 'POST', body: { reason: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); };
+A.reportPost = function (id) { ask('سبب البلاغ', false, function (t) { api('/social/posts/' + id + '/report', { method: 'POST', body: { reason: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); }); };
+A.reportComment = function (id) { ask('سبب البلاغ', false, function (t) { api('/social/comments/' + id + '/report', { method: 'POST', body: { reason: t } }).then(function () { toast('وصل بلاغك للإدارة'); }).catch(fail); }); };
 A.delPost = function (id) { if (!confirm('حذف البوست؟')) return; api('/social/posts/' + id, { method: 'DELETE' }).then(function () { toast('تم الحذف'); location.hash = '#/feed'; feedPage(); }).catch(fail); };
 function feedPage() {
   layout('feed', 'التايم لاين', 'أخبار ومشاركات المجتمع');
@@ -496,7 +501,7 @@ function admModeration() {
     $('cm_go').onclick = function () { act($('cm_go'), function () { return api('/social/communities', { method: 'POST', body: { name: val('cm_n'), description: val('cm_d'), rules: val('cm_r') } }); }, 'تم الإنشاء').then(admModeration, function () { }); };
   }).catch(errBox);
 }
-A.resRep = function (id, hide) { var n = prompt('ملاحظة القرار (اختياري):') || ''; api('/social/reports/' + id + '/resolve', { method: 'POST', body: { hide: hide, resolution: n } }).then(function () { toast('تم'); admModeration(); }).catch(fail); };
+A.resRep = function (id, hide) { ask('ملاحظة القرار (اختياري)', true, function (n) { api('/social/reports/' + id + '/resolve', { method: 'POST', body: { hide: hide, resolution: n } }).then(function () { toast('تم'); admModeration(); }).catch(fail); }); };
 
 /* ---------- jobs ---------- */
 var ET = { full_time: 'دوام كامل', part_time: 'دوام جزئي', internship: 'تدريب' };
@@ -554,7 +559,7 @@ A.appSt = function (aid, st, jid) { if (!st) return; api('/jobs/applications/' +
 /* ---------- organization ---------- */
 var DOCS = [['commercial_register', 'السجل التجاري'], ['tax_card', 'البطاقة الضريبية'], ['address_proof', 'إثبات العنوان'], ['license', 'ترخيص (اختياري)']];
 function orgHome() {
-  layout('home', 'أهلًا بـ ' + (auth.displayName || ''), auth.role === 'company' ? 'لوحة الشركة' : 'لوحة الجمعية');
+  layout('home', 'أهلًا بـ ' + (auth.displayName || ''), auth.role === 'company' ? 'لوحة الشركة' : auth.role === 'shop' ? 'لوحة المحل' : 'لوحة الجمعية');
   Promise.all([api('/me/organization'), api('/me/organization/review-status')]).then(function (r) {
     var o = r[0], s = r[1];
     var steps = [['بيانات الجهة', (o.profileCompletionPercent || 0) >= 100], ['اللوجو', !!o.logoUrl], ['المستندات المطلوبة', !(o.missingDocuments || []).length], ['الإرسال للمراجعة', !!s.reviewId], ['قرار الأدمن', o.approvalStatus === 'approved']];
@@ -565,7 +570,7 @@ function orgHome() {
 }
 function orgForm() {
   var isC = auth.role === 'company';
-  layout('org', isC ? 'بيانات الشركة' : 'بيانات الجمعية', 'بتظهر للمتطوعين بعد الاعتماد');
+  layout('org', auth.role === 'shop' ? 'بيانات المحل' : isC ? 'بيانات الشركة' : 'بيانات الجمعية', 'بتظهر للمتطوعين بعد الاعتماد');
   Promise.all([api('/me/organization'), meta('governorates'), meta('business-fields'), meta('employee-ranges')]).then(function (r) {
     var o = r[0], govs = r[1], bf = r[2], er = r[3];
     var opt = function (list, v, k) { return '<option value="">اختار</option>' + list.map(function (x) { return '<option value="' + esc(x.key) + '"' + (v === x.key || v === x.nameAr ? ' selected' : '') + '>' + esc(x.nameAr) + '</option>'; }).join(''); };
@@ -621,7 +626,7 @@ function admList(kind, page, title) {
     var l = items(r);
     body('<div class="tabs">' + tabs.map(function (t) { return '<span class="' + (fl[key] === t[0] ? 'on' : '') + '" data-s="' + t[0] + '">' + t[1] + '</span>'; }).join('') + '</div><div class="card">' +
       (l.length ? (kind === 'volunteer' ? table(['المتطوع', 'البريد', 'موعد المقابلة', 'الحالة', ''], l.map(function (x) { return [esc(x.volunteerName || '—'), '<span dir="ltr">' + esc(x.email) + '</span>', dt(x.interviewAt), st(x.status), '<a class="btn s" href="#/vreview/' + x.reviewId + '">مراجعة</a>']; })) :
-        table(['الجهة', 'النوع', 'الحالة', 'تاريخ الطلب', ''], l.map(function (x) { return [esc(x.organizationName), x.organizationType === 'company' ? 'شركة' : 'جمعية', st(x.status), d(x.requestedAt), '<a class="btn s" href="#/oreview/' + x.reviewId + '">مراجعة</a>']; }))) : empty('مفيش طلبات.')) + '</div>');
+        table(['الجهة', 'النوع', 'الحالة', 'تاريخ الطلب', ''], l.map(function (x) { return [esc(x.organizationName), x.organizationType === 'company' ? 'شركة' : x.organizationType === 'shop' ? 'محل' : 'جمعية', st(x.status), d(x.requestedAt), '<a class="btn s" href="#/oreview/' + x.reviewId + '">مراجعة</a>']; }))) : empty('مفيش طلبات.')) + '</div>');
     document.querySelectorAll('.tabs span').forEach(function (e) { e.onclick = function () { fl[key] = e.getAttribute('data-s'); admList(kind, page, title); }; });
   }).catch(errBox);
 }
@@ -711,13 +716,48 @@ function admAudit() {
   }).catch(errBox);
 }
 
+/* ---------- shops ---------- */
+var shf = { q: '' };
+function shopsPage() {
+  layout('shops', 'المحلات', 'محلات معتمدة بتعرض منتجاتها وبيانات التواصل');
+  api('/shops?pageSize=50' + (shf.q ? '&q=' + encodeURIComponent(shf.q) : ''), { anon: true }).then(function (r) {
+    var l = items(r);
+    body('<div class="card" style="display:flex;gap:10px;flex-wrap:wrap"><input id="shq" placeholder="ابحث عن محل أو منتج" value="' + esc(shf.q) + '" style="flex:1;min-width:160px"><button class="btn" id="shgo">بحث</button></div>' +
+      (l.length ? '<div class="row" style="align-items:stretch">' + l.map(function (x) { return '<a class="card col" href="#/shop/' + x.organizationId + '" style="flex:1;min-width:240px;text-decoration:none;color:inherit"><b style="font-size:18px">' + esc(x.name) + '</b><div style="color:var(--muted);font-size:14px">' + esc(x.description || '') + '</div><div>' + tag('tg', x.productsCount + ' منتج متاح') + '</div></a>'; }).join('') + '</div>' : empty('مفيش محلات معتمدة لسه.')));
+    $('shgo').onclick = function () { shf.q = val('shq'); shopsPage(); };
+  }).catch(errBox);
+}
+function shopPage(id) {
+  layout('shops', 'تفاصيل المحل', '');
+  api('/shops/' + id, { anon: true }).then(function (s) {
+    body('<a href="#/shops">← رجوع</a><div class="card col"><h3 style="margin:0">' + esc(s.name) + '</h3><div style="color:var(--muted)">' + esc(s.description || '') + '</div>' + (s.contactInformation ? '<div class="note i">للتواصل: ' + esc(s.contactInformation) + '</div>' : '') + (s.website ? '<div dir="ltr"><a href="' + esc(s.website) + '" target="_blank" rel="noopener">' + esc(s.website) + '</a></div>' : '') + '<small style="color:var(--muted)">العرض هنا للتعريف والتواصل فقط، مفيش شراء أونلاين.</small></div>' +
+      (s.products.length ? '<div class="row" style="align-items:stretch">' + s.products.map(function (p) { return '<div class="card col" style="flex:1;min-width:220px"><b>' + esc(p.name) + '</b><div style="color:var(--muted);font-size:14px">' + esc(p.description || '') + '</div><div>' + (p.price == null ? tag('tn', 'السعر عند التواصل') : tag('tg', p.price + ' جنيه')) + '</div></div>'; }).join('') + '</div>' : empty('المحل لسه ما أضافش منتجات.')));
+  }).catch(errBox);
+}
+function myProductsPage() {
+  layout('myproducts', 'منتجاتي', 'المنتجات اللي بتظهر في صفحة المحل بعد الاعتماد', '<button class="btn" id="np">+ منتج جديد</button>');
+  var form = function (p, done) {
+    p = p || {};
+    var o = modal('<h3>' + (p.productId ? 'تعديل منتج' : 'منتج جديد') + '</h3><div class="col" style="gap:8px"><label class="fld">الاسم<input id="pr_n" value="' + esc(p.name) + '"></label><label class="fld">الوصف<textarea id="pr_d" rows="3">' + esc(p.description) + '</textarea></label><label class="fld">السعر بالجنيه (سيبه فاضي لو عند التواصل)<input id="pr_p" type="number" min="0" step="0.01" value="' + (p.price == null ? '' : esc(p.price)) + '"></label><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="pr_a"' + (p.available === false ? '' : ' checked') + '> متاح</label><button class="btn" id="pr_go">حفظ</button></div>');
+    $('pr_go').onclick = function () { act($('pr_go'), function () { var b = { name: val('pr_n'), description: val('pr_d') || null, price: val('pr_p') === '' ? null : Number(val('pr_p')), available: $('pr_a').checked }; return p.productId ? api('/shops/products/' + p.productId, { method: 'PUT', body: b }) : api('/shops/products', { method: 'POST', body: b }); }, 'تم الحفظ').then(function () { o.remove(); done(); }, function () { }); };
+  };
+  $('np').onclick = function () { form(null, myProductsPage); };
+  api('/shops/mine/products').then(function (l) {
+    window.__prods = l;
+    body(l.length ? l.map(function (p, i) { return '<div class="card" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b style="flex:1">' + esc(p.name) + '</b>' + (p.available ? tag('tg', 'متاح') : tag('tn', 'غير متاح')) + (p.price == null ? '' : tag('tn', p.price + ' جنيه')) + '<button class="btn g s" onclick="A.editProd(' + i + ')">تعديل</button><button class="btn g s" onclick="A.delProd(\'' + p.productId + '\')">حذف</button></div>'; }).join('') : empty('لسه ما أضفتش منتجات. (لازم المحل يكون معتمد)'));
+    A.editProd = function (i) { form(window.__prods[i], myProductsPage); };
+  }).catch(function (e) { body('<div class="note e">' + esc(e.message) + '</div>'); });
+}
+A.delProd = function (id) { if (!confirm('حذف المنتج؟')) return; api('/shops/products/' + id, { method: 'DELETE' }).then(function () { toast('تم الحذف'); myProductsPage(); }).catch(fail); };
+
 /* ---------- router ---------- */
 var PAGES = {
-  volunteer: { jobs: jobsPage, feed: feedPage, communities: communitiesPage, home: volHome, verification: volVerification, interview: volInterview, availability: volAvailability, training: volTraining, open: volOpen, mine: volMine, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
-  disabled_user: { myapps: myAppsPage, jobs: jobsPage, feed: feedPage, communities: communitiesPage, home: duHome, needs: duNeeds, requests: duRequests, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
-  association: { myjobs: myJobsPage, jobs: jobsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
-  company: { myjobs: myJobsPage, jobs: jobsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
-  admin: { jobs: jobsPage, feed: feedPage, moderation: admModeration, home: admHome, vreviews: function () { admList('volunteer', 'vreviews', 'مراجعة المتطوعين'); }, oreviews: function () { admList('organization', 'oreviews', 'مراجعة الجمعيات والشركات'); }, slots: admSlots, users: admUsers, deletions: admDeletions, leads: admLeads, audit: admAudit, notifications: notificationsPage, settings: settingsPage }
+  volunteer: { jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: volHome, verification: volVerification, interview: volInterview, availability: volAvailability, training: volTraining, open: volOpen, mine: volMine, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
+  disabled_user: { myapps: myAppsPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: duHome, needs: duNeeds, requests: duRequests, profile: profilePage, notifications: notificationsPage, settings: settingsPage },
+  association: { myjobs: myJobsPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
+  company: { myjobs: myJobsPage, jobs: jobsPage, shops: shopsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
+  shop: { shops: shopsPage, myproducts: myProductsPage, feed: feedPage, communities: communitiesPage, home: orgHome, org: orgForm, media: orgMedia, docs: orgDocs, status: orgStatus, notifications: notificationsPage, settings: settingsPage },
+  admin: { jobs: jobsPage, shops: shopsPage, feed: feedPage, moderation: admModeration, home: admHome, vreviews: function () { admList('volunteer', 'vreviews', 'مراجعة المتطوعين'); }, oreviews: function () { admList('organization', 'oreviews', 'مراجعة الجمعيات والشركات والمحلات'); }, slots: admSlots, users: admUsers, deletions: admDeletions, leads: admLeads, audit: admAudit, notifications: notificationsPage, settings: settingsPage }
 };
 function route() {
   var h = (location.hash || '').replace(/^#\/?/, '');
@@ -730,6 +770,7 @@ function route() {
   }
   if (p === 'login' || p === 'register' || p === 'forgot' || !p) { location.hash = '#/home'; return; }
   if (p === 'jobapps' && parts[1] && (auth.role === 'company' || auth.role === 'association')) return loadUnread().then(function () { jobAppsPage(parts[1]); }, function () { jobAppsPage(parts[1]); });
+  if (p === 'shop' && parts[1]) return loadUnread().then(function () { shopPage(parts[1]); }, function () { shopPage(parts[1]); });
   if (p === 'post' && parts[1]) return loadUnread().then(function () { postPage(parts[1]); }, function () { postPage(parts[1]); });
   if (p === 'user' && parts[1]) return loadUnread().then(function () { userPage(parts[1]); }, function () { userPage(parts[1]); });
   if (p === 'request' && parts[1] && (auth.role === 'volunteer' || auth.role === 'disabled_user')) return loadUnread().then(function () { requestPage(parts[1]); }, function () { requestPage(parts[1]); });
