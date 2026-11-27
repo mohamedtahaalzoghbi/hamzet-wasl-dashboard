@@ -186,6 +186,7 @@ A.read = function (id, b) { act(b, function () { return api('/me/notifications/'
 function settingsPage() {
   layout('settings', 'الإعدادات', 'الحساب والخصوصية');
   var del = auth.role === 'admin' ? '' : '<div class="card col" style="border-color:#f4c1b3"><h3 style="color:#b83a1b">حذف الحساب</h3><p style="color:var(--muted);margin:0">هيتبعت طلب للأدمن، وبعد الموافقة بياناتك بتتمسح نهائيًا. الحساب بيفضل شغال لحد الموافقة.</p><button class="btn o" id="st_del" style="width:max-content">طلب حذف الحساب</button></div>';
+  api('/auth/session').then(function (ss) { if (ss && ss.emailVerified === false && $('body')) { var h = document.createElement('div'); h.innerHTML = emailCard(); $('body').insertBefore(h.firstChild, $('body').firstChild); bindEmail(settingsPage); } }).catch(function () { });
   body('<div class="row"><div class="card col"><h3>تغيير كلمة المرور</h3><label class="fld">كلمة المرور الحالية<input id="st_cur" type="password"></label><label class="fld">كلمة مرور جديدة<input id="st_new" type="password"></label><label class="fld">تأكيد كلمة المرور الجديدة<input id="st_new2" type="password"></label><button class="btn" id="st_go" style="width:max-content">تغيير</button></div>' + del + '</div>');
   $('st_go').onclick = function () {
     act($('st_go'), function () { return api('/auth/change-password', { method: 'POST', body: { currentPassword: $('st_cur').value, newPassword: $('st_new').value, confirmNewPassword: $('st_new2').value, confirmPassword: $('st_new2').value } }); }, 'تم تغيير كلمة المرور');
@@ -241,6 +242,16 @@ function profilePage() {
     }).catch(errBox);
 }
 
+
+function emailCard() {
+  return '<div class="card col" id="em_card"><h3>تأكيد البريد الإلكتروني</h3><p style="margin:0;color:var(--muted)">لازم تأكد بريدك قبل رفع الأدلة. هنبعتلك كود من 6 أرقام.</p><button class="btn g" id="em_send" style="width:max-content">إرسال الكود</button><div class="row"><label class="fld">الكود<input id="em_code" inputmode="numeric" maxlength="6"></label></div><button class="btn" id="em_ok" style="width:max-content">تأكيد</button></div>';
+}
+function bindEmail(done) {
+  var s = $('em_send'); if (!s) return;
+  s.onclick = function () { act(s, function () { return api('/auth/email/send-code', { method: 'POST', body: {} }); }, 'تم إرسال الكود لبريدك').catch(function () { }); };
+  $('em_ok').onclick = function () { act($('em_ok'), function () { return api('/auth/email/verify', { method: 'POST', body: { code: val('em_code') } }); }, 'تم تأكيد البريد').then(done, function () { }); };
+}
+
 /* ---------- volunteer ---------- */
 var STEP_AR = { email: 'تأكيد البريد', phone: 'تأكيد الهاتف', national_id_front: 'الهوية (وجه)', national_id_back: 'الهوية (خلف)', social_links: 'حسابات التواصل', face_photo: 'سيلفي', interview: 'حجز المقابلة', decision: 'قرار الأدمن' };
 function volHome() {
@@ -261,12 +272,14 @@ function volVerification() {
   api('/me/verification').then(function (v) {
     var up = v.uploadedEvidenceTypes || [];
     var sl = {}; (v.socialLinks || []).forEach(function (s) { sl[s.platform] = s.url; });
-    body('<div class="note ' + ({ approved: 'ok', rejected: 'e' }[v.status] || 'i') + '">' + st(v.status) + ' ' + ({ approved: 'حسابك معتمد.', rejected: 'تم رفض الطلب، تقدر تقدّم من جديد.', interview_scheduled: 'الأدمن هيراجع الأدلة بعد المقابلة وتوصلك النتيجة كإشعار.' }[v.status] || 'كمّل الخطوات وارفع الأدلة.') + '</div>' +
+    var emDone = (v.steps || []).some(function (x) { return x.key === 'email' && x.completed; });
+    body((emDone ? '' : emailCard()) + '<div class="note ' + ({ approved: 'ok', rejected: 'e' }[v.status] || 'i') + '">' + st(v.status) + ' ' + ({ approved: 'حسابك معتمد.', rejected: 'تم رفض الطلب، تقدر تقدّم من جديد.', interview_scheduled: 'الأدمن هيراجع الأدلة بعد المقابلة وتوصلك النتيجة كإشعار.' }[v.status] || 'كمّل الخطوات وارفع الأدلة.') + '</div>' +
       '<div class="row"><div class="card" style="flex:1.4"><h3>الأدلة المرفوعة</h3><div class="row">' + EVID.map(function (e) { var ok = up.indexOf(e[0]) >= 0; return '<div class="col" style="gap:8px"><div class="ph" style="min-height:90px">' + e[1] + '</div>' + (ok ? tag('tg', 'مرفوعة') : tag('tw', 'مطلوبة')) + '<label class="btn g s" style="text-align:center">' + (ok ? 'استبدال' : 'رفع') + '<input type="file" accept="image/*" hidden data-ev="' + e[0] + '"></label></div>'; }).join('') + '</div><p style="color:var(--muted);font-size:13px">صور حتى 10MB (PNG/JPG). بتتشاف للأدمن بس.</p></div>' +
       '<div class="card col"><h3>حسابات التواصل</h3>' + ['facebook', 'linkedin', 'instagram'].map(function (p) { return '<label class="fld">' + p + '<input dir="ltr" id="sl_' + p + '" value="' + esc(sl[p] || '') + '" placeholder="https://…"></label>'; }).join('') + '<button class="btn" id="sl_save" style="width:max-content">حفظ</button></div></div>');
     document.querySelectorAll('input[data-ev]').forEach(function (i) {
       i.onchange = function () { var f = i.files[0]; if (!f) return; var fd = new FormData(); fd.append('evidenceType', i.getAttribute('data-ev')); fd.append('file', f); api('/me/verification/evidence', { method: 'POST', form: fd }).then(function () { toast('تم الرفع'); volVerification(); }).catch(fail); };
     });
+    bindEmail(volVerification);
     $('sl_save').onclick = function () {
       var links = ['facebook', 'linkedin', 'instagram'].map(function (p) { return { platform: p, url: val('sl_' + p) }; }).filter(function (x) { return x.url; });
       act($('sl_save'), function () { return api('/me/verification/social-links', { method: 'PUT', body: { links: links } }); }, 'تم الحفظ');
@@ -376,7 +389,7 @@ function orgHome() {
   Promise.all([api('/me/organization'), api('/me/organization/review-status')]).then(function (r) {
     var o = r[0], s = r[1];
     var steps = [['بيانات الجهة', (o.profileCompletionPercent || 0) >= 100], ['اللوجو', !!o.logoUrl], ['المستندات المطلوبة', !(o.missingDocuments || []).length], ['الإرسال للمراجعة', !!s.reviewId], ['قرار الأدمن', o.approvalStatus === 'approved']];
-    body('<div class="row">' + kpi(({ pending: 'قيد المراجعة', approved: 'معتمدة', rejected: 'مرفوضة' })[o.approvalStatus] || o.approvalStatus, 'حالة الاعتماد') + kpi((o.documents || []).length + ' / 3', 'المستندات المرفوعة') + kpi((o.profileCompletionPercent || 0) + '%', 'اكتمال الملف') + '</div>' +
+    body('<div class="row">' + kpi(({ pending: 'قيد المراجعة', approved: 'معتمدة', rejected: 'مرفوضة' })[o.approvalStatus] || o.approvalStatus, 'حالة الاعتماد') + kpi((o.documents || []).filter(function (x) { return x.documentType !== 'license'; }).length + ' / 3', 'المستندات المطلوبة المرفوعة') + kpi((o.profileCompletionPercent || 0) + '%', 'اكتمال الملف') + '</div>' +
       '<div class="row"><div class="card" style="flex:1.4"><h3>خطوات الاعتماد</h3><div class="tl">' + steps.map(function (x) { return '<div>' + (x[1] ? '✓ ' : '') + (x[1] ? esc(x[0]) : '<b>' + esc(x[0]) + '</b>') + '<small>' + (x[1] ? 'تمت' : 'لسه') + '</small></div>'; }).join('') + '</div></div>' +
       '<div class="card"><h3>إجراءات سريعة</h3><div class="col" style="gap:10px"><a class="btn" href="#/org" style="text-align:center">تعديل البيانات</a><a class="btn g" href="#/docs" style="text-align:center">المستندات</a><a class="btn g" href="#/status" style="text-align:center">حالة الاعتماد</a></div></div></div>');
   }).catch(errBox);
@@ -405,7 +418,7 @@ function orgDocs() {
   layout('docs', 'المستندات', 'ارفع المطلوب وابعت للمراجعة');
   api('/me/organization').then(function (o) {
     var have = {}; (o.documents || []).forEach(function (x) { have[x.documentType] = x.uploadedAt; });
-    body('<div class="row">' + DOCS.map(function (dd) { return '<div class="card col"><div class="ph">' + dd[1] + '</div>' + (have[dd[0]] ? tag('tg', 'مرفوع · ' + d(have[dd[0]])) : tag(dd[0] === 'license' ? 'tn' : 'tw', dd[0] === 'license' ? 'اختياري' : 'مطلوب')) + '<label class="btn g s" style="text-align:center">' + (have[dd[0]] ? 'استبدال' : 'رفع') + '<input type="file" hidden accept=".pdf,image/png,image/jpeg" data-doc="' + dd[0] + '"></label></div>'; }).join('') + '</div><div class="card" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><span style="flex:1">لما تخلص البيانات واللوجو والمستندات، ابعت الطلب للأدمن.' + ((o.missingDocuments || []).length ? '<br><small style="color:var(--muted)">ناقص: ' + o.missingDocuments.map(function (m) { return esc((DOCS.filter(function (x) { return x[0] === m; })[0] || [0, m])[1]); }).join('، ') + '</small>' : '') + '</span><button class="btn" id="dc_sub"' + (o.canSubmit ? '' : ' disabled') + '>إرسال للمراجعة</button></div>');
+    body('<div class="row">' + DOCS.map(function (dd) { return '<div class="card col"><div class="ph">' + dd[1] + '</div>' + (have[dd[0]] ? tag('tg', 'مرفوع · ' + d(have[dd[0]])) : tag(dd[0] === 'license' ? 'tn' : 'tw', dd[0] === 'license' ? 'اختياري' : 'مطلوب')) + '<label class="btn g s" style="text-align:center">' + (have[dd[0]] ? 'استبدال' : 'رفع') + '<input type="file" hidden accept=".pdf,image/png,image/jpeg" data-doc="' + dd[0] + '"></label></div>'; }).join('') + '</div><div class="card" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><span style="flex:1">لما تخلص البيانات واللوجو والمستندات، ابعت الطلب للأدمن.' + ((o.missingDocuments || []).length ? '<br><small style="color:var(--muted)">ناقص: ' + o.missingDocuments.map(function (m) { return esc((DOCS.filter(function (x) { return x[0] === m; })[0] || [0, m])[1]); }).join('، ') + '</small>' : '') + '</span><button class="btn" id="dc_sub"' + (o.canSubmit ? '' : ' disabled') + '>' + (!o.canSubmit && !(o.missingDocuments || []).length ? 'تم الإرسال' : 'إرسال للمراجعة') + '</button></div>');
     document.querySelectorAll('input[data-doc]').forEach(function (i) { i.onchange = function () { var f = i.files[0]; if (!f) return; var fd = new FormData(); fd.append('file', f); api('/me/organization/documents/' + i.getAttribute('data-doc'), { method: 'PUT', form: fd }).then(function () { toast('تم الرفع'); orgDocs(); }).catch(fail); }; });
     $('dc_sub').onclick = function () { act($('dc_sub'), function () { return api('/me/organization/submit', { method: 'POST' }); }, 'تم إرسال الطلب').then(function () { location.hash = '#/status'; }); };
   }).catch(errBox);
@@ -546,6 +559,7 @@ function route() {
   loadUnread().then(fn, fn);
 }
 window.addEventListener('hashchange', route);
+window.addEventListener('unhandledrejection', function (e) { e.preventDefault(); });
 (function boot() {
   if (!auth) { route(); return; }
   api('/auth/session').then(function (s) {
