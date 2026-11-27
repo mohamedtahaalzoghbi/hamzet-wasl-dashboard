@@ -543,6 +543,7 @@ function admOReview(id) {
   api('/admin/organization-reviews/' + id).then(function (o) {
     body('<div class="row"><div class="col" style="flex:1.5"><div class="card"><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div style="flex:1"><div style="font-size:20px;font-weight:800">' + esc(o.organizationName) + '</div><div style="color:var(--muted)">' + (o.organizationType === 'company' ? 'شركة' : 'جمعية') + ' · ' + esc(o.field || '') + '</div></div>' + st(o.status) + '</div><p style="color:var(--muted);line-height:1.9">' + esc(o.description || '') + '</p><div class="row"><div class="fld">المحافظة<b>' + esc(o.governorate || '—') + '</b></div><div class="fld">المدينة<b>' + esc(o.city || '—') + '</b></div><div class="fld">الموقع<b dir="ltr">' + esc(o.website || '—') + '</b></div><div class="fld">التواصل<b>' + esc(o.contactInformation || '—') + '</b></div></div></div>' +
       '<div class="card"><h3>المستندات (روابط مؤقتة 10 دقائق)</h3><div class="row">' + (o.documents || []).map(function (x) { return '<div class="col" style="gap:6px"><div class="ph">' + esc((DOCS.filter(function (z) { return z[0] === x.documentType; })[0] || [0, x.documentType])[1]) + '</div><a class="btn g s" style="text-align:center" href="' + esc(evUrl(x.shortLivedUrl)) + '" target="_blank" rel="noopener">فتح</a></div>'; }).join('') + '</div></div></div><div class="col">' + (o.decisionNotes ? '<div class="note i">ملاحظات سابقة: ' + esc(o.decisionNotes) + '</div>' : '') + decisionBox('organization', id, true) + '</div></div>');
+    if (o.ownerUserId) { var hb = document.querySelector('.top'); if (hb) { var sb = document.createElement('button'); sb.className = 'btn g'; sb.textContent = 'إيقاف حساب الجهة'; sb.onclick = function () { A.suspend(o.ownerUserId, o.organizationName || '', true); }; hb.appendChild(sb); } }
     bindDecision('organization', id, '#/oreviews');
   }).catch(errBox);
 }
@@ -555,11 +556,17 @@ function admSlots() {
   }).catch(errBox);
 }
 A.slotDel = function (id, b) { if (!confirm('حذف الموعد؟')) return; act(b, function () { return api('/admin/interview-slots/' + id, { method: 'DELETE' }); }, 'تم الحذف').then(admSlots); };
+var uf = { role: '', status: '', q: '' };
 function admUsers() {
   layout('users', 'المستخدمون', 'إيقاف وإعادة تفعيل الحسابات');
-  api('/admin/volunteer-reviews?pageSize=100').then(function (r) {
-    var seen = {}; var l = items(r).filter(function (x) { if (seen[x.volunteerId]) return false; seen[x.volunteerId] = 1; return true; });
-    body('<div class="note i">قائمة المتطوعين من طلبات المراجعة. الباك حاليًا ما فيهوش قائمة مستخدمين كاملة، فالجهات بتتوقف من صفحة تفاصيل الجهة لما الباك يدعمها.</div><div class="card">' + (l.length ? table(['المستخدم', 'البريد', 'الإجراء'], l.map(function (x) { return [esc(x.volunteerName || '—'), '<span dir="ltr">' + esc(x.email) + '</span>', '<button class="btn s g" onclick="A.suspend(\'' + x.volunteerId + '\',\'' + esc(x.volunteerName || x.email).replace(/'/g, '') + '\',true)">إيقاف</button> <button class="btn s" onclick="A.suspend(\'' + x.volunteerId + '\',\'\',false)">إعادة تفعيل</button>']; })) : empty('مفيش مستخدمين.')) + '</div>');
+  var qs = '?pageSize=100' + (uf.role ? '&role=' + uf.role : '') + (uf.status ? '&status=' + uf.status : '') + (uf.q ? '&search=' + encodeURIComponent(uf.q) : '');
+  api('/admin/users' + qs).then(function (r) {
+    var l = items(r);
+    var opt = function (o, cur) { return o.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === cur ? ' selected' : '') + '>' + x[1] + '</option>'; }).join(''); };
+    var bar = '<div class="card" style="display:flex;gap:10px;flex-wrap:wrap"><input id="uf_q" placeholder="بحث بالاسم أو البريد" value="' + esc(uf.q) + '" style="flex:1;min-width:160px"><select id="uf_r">' + opt([['', 'كل الأنواع'], ['volunteer', 'متطوع'], ['disabled_user', 'صاحب همة'], ['association', 'جمعية'], ['company', 'شركة'], ['admin', 'مدير']], uf.role) + '</select><select id="uf_s">' + opt([['', 'كل الحالات'], ['active', 'نشط'], ['suspended', 'موقوف']], uf.status) + '</select><button class="btn" id="uf_go">بحث</button></div>';
+    body(bar + '<div class="card">' + (l.length ? table(['المستخدم', 'النوع', 'البريد', 'الحالة', 'الإجراء'], l.map(function (x) { var nm = esc((x.displayName || x.email).replace(/[\'"]/g, '')); var sus = x.accountStatus === 'suspended'; return [esc(x.displayName || '—'), esc(ROLE_AR[x.role] || x.role), '<span dir="ltr">' + esc(x.email) + '</span>', sus ? tag('tr', 'موقوف') : tag('tg', 'نشط'), x.role === 'admin' ? '—' : (sus ? '<button class="btn s" onclick="A.suspend(\'' + x.userId + '\',\'\',false)">إعادة تفعيل</button>' : '<button class="btn s g" onclick="A.suspend(\'' + x.userId + '\',\'' + nm + '\',true)">إيقاف</button>')]; })) : empty('مفيش مستخدمين بالمواصفات دي.')) + '</div>');
+    var go = function () { uf.q = val('uf_q'); uf.role = val('uf_r'); uf.status = val('uf_s'); admUsers(); };
+    $('uf_go').onclick = go; $('uf_q').onkeydown = function (e) { if (e.key === 'Enter') go(); };
   }).catch(errBox);
 }
 A.suspend = function (id, name, on) {
