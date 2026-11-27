@@ -92,6 +92,7 @@ function applyA11y(p) {
   b.classList.toggle('hc', !!(p && (p.highContrast || p.theme === 'high_contrast')));
   b.classList.toggle('rm', !!(p && p.reducedMotion));
   document.documentElement.style.fontSize = p && p.fontScale ? (16 * Math.min(2, Math.max(1, +p.fontScale))) + 'px' : '';
+  if (window.HWA) { if (p) HWA.fromServer(p); else HWA.reset(); }
 }
 
 /* ---------- auth screens ---------- */
